@@ -14,61 +14,91 @@ st.set_page_config(
 )
 
 # -----------------------------
-# 🔥 CUSTOM CSS STYLE
+# 🎨 ADVANCED CUSTOM CSS
 # -----------------------------
 st.markdown(
     """
     <style>
-    /* Main background */
+    /* Background */
     .stApp {
-        background: linear-gradient(to right, #fdfbfb, #ebedee);
+        background: linear-gradient(135deg, #667eea, #764ba2);
         font-family: 'Segoe UI', sans-serif;
+    }
+
+    /* Center main container */
+    .block-container {
+        background: rgba(255, 255, 255, 0.15);
+        backdrop-filter: blur(12px);
+        padding: 2.5rem;
+        border-radius: 18px;
+        max-width: 650px;
+        margin-top: 40px;
+        box-shadow: 0 8px 32px rgba(0,0,0,0.25);
     }
 
     /* Title */
     h1 {
-        color: #2c3e50;
         text-align: center;
+        color: #ffffff;
+        font-weight: 700;
+        margin-bottom: 10px;
     }
 
-    /* Sub text */
-    p {
+    /* Description text */
+    .desc {
+        text-align: center;
+        color: #f1f1f1;
         font-size: 16px;
-        color: #34495e;
+        margin-bottom: 25px;
+    }
+
+    /* Slider labels */
+    label {
+        color: #ffffff !important;
+        font-weight: 600;
     }
 
     /* Buttons */
     div.stButton > button {
-        background-color: #4CAF50;
+        width: 100%;
+        background: linear-gradient(to right, #43cea2, #185a9d);
         color: white;
-        padding: 0.6em 2em;
-        font-size: 16px;
-        border-radius: 8px;
+        font-size: 18px;
+        padding: 0.7em;
+        border-radius: 12px;
         border: none;
-        transition: 0.3s;
+        margin-top: 15px;
+        transition: all 0.3s ease;
     }
 
     div.stButton > button:hover {
-        background-color: #45a049;
         transform: scale(1.03);
+        box-shadow: 0 0 15px rgba(67, 206, 162, 0.7);
     }
 
-    /* Sliders */
-    .stSlider > label {
-        font-weight: bold;
-        color: #2c3e50;
-    }
-
-    /* Result boxes */
+    /* Result cards */
     .stAlert {
-        border-radius: 10px;
+        border-radius: 14px;
         font-size: 18px;
+        text-align: center;
+    }
+
+    /* Divider */
+    hr {
+        border: none;
+        height: 1px;
+        background: rgba(255,255,255,0.3);
+        margin: 30px 0;
     }
 
     /* Footer */
-    footer {
-        visibility: hidden;
+    .footer {
+        text-align: center;
+        color: #e0e0e0;
+        font-size: 13px;
+        margin-top: 20px;
     }
+
     </style>
     """,
     unsafe_allow_html=True
@@ -95,11 +125,13 @@ scaler = joblib.load(SCALER_PATH)
 st.title("🎓 Student Result Prediction System")
 st.markdown(
     """
-    This system predicts whether a student will **Pass or Fail**
-    using **Logistic Regression** based on:
-    - 📘 Study Hours  
-    - 📊 Attendance  
-    """
+    <div class="desc">
+        Predict whether a student will <b>Pass or Fail</b> using
+        <b>Machine Learning (Logistic Regression)</b><br>
+        based on Study Hours & Attendance
+    </div>
+    """,
+    unsafe_allow_html=True
 )
 
 st.divider()
@@ -108,14 +140,14 @@ st.divider()
 # User inputs
 # -----------------------------
 study_hours = st.slider(
-    "📘 Study Hours (per day)",
+    "📘 Study Hours per Day",
     min_value=0.0,
     max_value=10.0,
     step=0.1
 )
 
 attendance = st.slider(
-    "📊 Attendance (%)",
+    "📊 Attendance Percentage",
     min_value=0.0,
     max_value=100.0,
     step=1.0
@@ -138,13 +170,19 @@ if st.button("🔍 Predict Result"):
 
     if prediction[0] == 1:
         st.success("🎉 **STUDENT WILL PASS**")
+        st.info(f"📈 **Pass Probability:** {probability*100:.2f}%")
     else:
         st.error("❌ **STUDENT WILL FAIL**")
-
-    st.info(f"📈 **Pass Probability:** {probability*100:.2f}%")
+        st.info(f"📉 **Fail Probability:** {(1 - probability)*100:.2f}%")
 
 # -----------------------------
 # Footer
 # -----------------------------
-st.markdown("---")
-st.caption("Built with ❤️ using Streamlit & Logistic Regression")
+st.markdown(
+    """
+    <div class="footer">
+        Built with ❤️ using Streamlit & Machine Learning
+    </div>
+    """,
+    unsafe_allow_html=True
+)
