@@ -14,6 +14,67 @@ st.set_page_config(
 )
 
 # -----------------------------
+# 🔥 CUSTOM CSS STYLE
+# -----------------------------
+st.markdown(
+    """
+    <style>
+    /* Main background */
+    .stApp {
+        background: linear-gradient(to right, #fdfbfb, #ebedee);
+        font-family: 'Segoe UI', sans-serif;
+    }
+
+    /* Title */
+    h1 {
+        color: #2c3e50;
+        text-align: center;
+    }
+
+    /* Sub text */
+    p {
+        font-size: 16px;
+        color: #34495e;
+    }
+
+    /* Buttons */
+    div.stButton > button {
+        background-color: #4CAF50;
+        color: white;
+        padding: 0.6em 2em;
+        font-size: 16px;
+        border-radius: 8px;
+        border: none;
+        transition: 0.3s;
+    }
+
+    div.stButton > button:hover {
+        background-color: #45a049;
+        transform: scale(1.03);
+    }
+
+    /* Sliders */
+    .stSlider > label {
+        font-weight: bold;
+        color: #2c3e50;
+    }
+
+    /* Result boxes */
+    .stAlert {
+        border-radius: 10px;
+        font-size: 18px;
+    }
+
+    /* Footer */
+    footer {
+        visibility: hidden;
+    }
+    </style>
+    """,
+    unsafe_allow_html=True
+)
+
+# -----------------------------
 # Load model & scaler
 # -----------------------------
 ROOT_DIR = os.path.abspath(os.path.dirname(__file__))
@@ -36,15 +97,15 @@ st.markdown(
     """
     This system predicts whether a student will **Pass or Fail**
     using **Logistic Regression** based on:
-    - Study Hours
-    - Attendance
+    - 📘 Study Hours  
+    - 📊 Attendance  
     """
 )
 
 st.divider()
 
 # -----------------------------
-# User inputs (LIVE)
+# User inputs
 # -----------------------------
 study_hours = st.slider(
     "📘 Study Hours (per day)",
@@ -76,9 +137,9 @@ if st.button("🔍 Predict Result"):
     st.divider()
 
     if prediction[0] == 1:
-        st.success(f"🎉 **PASS**")
+        st.success("🎉 **STUDENT WILL PASS**")
     else:
-        st.error(f"❌ **FAIL**")
+        st.error("❌ **STUDENT WILL FAIL**")
 
     st.info(f"📈 **Pass Probability:** {probability*100:.2f}%")
 
