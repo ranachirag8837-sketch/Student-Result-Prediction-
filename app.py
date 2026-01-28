@@ -165,28 +165,29 @@ if st.button("🔍 Predict Result"):
             # ================= PASS =================
             if pred[0] == 1:
                 # 🎊 CONFETTI ANIMATION USING COMPONENTS.HTML
-                components.html(f"""
+               components.html(f"""
                 <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
                 <script>
-                    let duration = 3 * 1000;
-                    let animationEnd = Date.now() + duration;
-                    let defaults = {{ startVelocity: 30, spread: 360, ticks: 60, zIndex: 2000 }};
-                    let interval = setInterval(function() {{
-                        let timeLeft = animationEnd - Date.now();
-                        if (timeLeft <= 0) return clearInterval(interval);
-                        let particleCount = 50 * (timeLeft / duration);
-                        confetti(Object.assign({}, defaults, {{
-                            particleCount,
-                            origin: {{ x: Math.random(), y: Math.random() - 0.2 }}
-                        }}));
-                    }}, 250);
-                </script>
+                let duration = 3 * 1000;
+                let animationEnd = Date.now() + duration;
+                let defaults = {{ startVelocity: 30, spread: 360, ticks: 60, zIndex: 2000 }};
+                let interval = setInterval(function() {{
+                let timeLeft = animationEnd - Date.now();
+                if (timeLeft <= 0) return clearInterval(interval);
+                    let particleCount = 50 * (timeLeft / duration);
+                    confetti(Object.assign({{}}, defaults, {{
+                    particleCount: particleCount,
+                    origin: {{ x: Math.random(), y: Math.random() - 0.2 }}
+            }}));
+    }}, 250);
+            </script>
 
-                <div style="text-align:center; font-size:24px; color:#fff; margin-top:20px;">
-                    🎉🎊 STUDENT WILL PASS 🎊🎉<br>
-                    📈 Pass Probability: <b>{prob*100:.2f}%</b>
-                </div>
-                """, height=400)
+        <div style="text-align:center; font-size:24px; color:#fff; margin-top:20px;">
+    🎉🎊 STUDENT WILL PASS 🎊🎉<br>
+    📈 Pass Probability: <b>{prob*100:.2f}%</b>
+    </div>
+""", height=400)
+
 
                 # Recommendations
                 st.markdown("""
@@ -236,3 +237,4 @@ st.markdown("""
 Built with ❤️ using Streamlit
 </div>
 """, unsafe_allow_html=True)
+
