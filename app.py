@@ -64,13 +64,15 @@ label {{
 }}
 
 .result-card {{
-    background: rgba(120,130,200,0.45);
-    padding: 18px;
-    border-radius: 16px;
+    background: linear-gradient(135deg, #00f260, #0575e6);
+    padding: 22px;
+    border-radius: 18px;
     margin-top: 15px;
-    font-size: 18px;
-    font-weight: 600;
-    color: #00ffcc;
+    font-size: 22px;
+    font-weight: 700;
+    color: white;
+    text-align: center;
+    box-shadow: 0 0 25px rgba(0,255,200,0.8);
 }}
 
 .prob-card {{
@@ -79,10 +81,12 @@ label {{
     border-radius: 14px;
     margin-top: 12px;
     color: #e6f0ff;
+    text-align: center;
 }}
 
 .fail {{
-    color: #ff6b6b;
+    background: rgba(255,90,90,0.35);
+    color: #ffdddd;
 }}
 
 .reco {{
@@ -126,14 +130,14 @@ st.title("🎓 Student Result Prediction System")
 st.markdown("""
 <div class="desc">
 Pass / Fail Prediction<br>
-<b>with Smart Recommendation System</b>
+<b>with Smart Recommendation & Celebration</b>
 </div>
 """, unsafe_allow_html=True)
 
 st.divider()
 
 # -----------------------------
-# Inputs (Textbox)
+# Inputs
 # -----------------------------
 study_hours = st.text_input("📘 Study Hours per Day", placeholder="e.g. 5")
 attendance = st.text_input("📊 Attendance Percentage", placeholder="e.g. 80")
@@ -157,10 +161,24 @@ if st.button("🔍 Predict Result"):
 
             st.divider()
 
+            # ================= PASS =================
             if pred[0] == 1:
+
+                # 🎊 CONFETTI ANIMATION
+                st.markdown("""
+                <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+                <script>
+                confetti({
+                    particleCount: 250,
+                    spread: 120,
+                    origin: { y: 0.6 }
+                });
+                </script>
+                """, unsafe_allow_html=True)
+
                 st.markdown(f"""
                 <div class="result-card">
-                🎉 STUDENT WILL PASS
+                🎉🎊 STUDENT WILL PASS 🎊🎉
                 </div>
 
                 <div class="prob-card">
@@ -180,6 +198,7 @@ if st.button("🔍 Predict Result"):
                 </div>
                 """, unsafe_allow_html=True)
 
+            # ================= FAIL =================
             else:
                 st.markdown(f"""
                 <div class="result-card fail">
