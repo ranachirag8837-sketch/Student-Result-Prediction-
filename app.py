@@ -1,7 +1,6 @@
 import streamlit as st
 import joblib
 import pandas as pd
-import os
 
 # -----------------------------
 # Page Config
@@ -20,7 +19,7 @@ with col2:
     mode = st.toggle("🌙 Dark Mode")
 
 # -----------------------------
-# Animated Background + Responsive CSS
+# Animated Background + CSS
 # -----------------------------
 st.markdown(f"""
 <style>
@@ -40,11 +39,9 @@ st.markdown(f"""
     100% {{ background-position: 0% 50%; }}
 }}
 
-/* Center Glass Card */
 .block-container {{
     background: {'rgba(0,0,0,0.45)' if mode else 'rgba(255,255,255,0.22)'};
     backdrop-filter: blur(16px);
-    -webkit-backdrop-filter: blur(16px);
     padding: 2rem;
     border-radius: 20px;
     max-width: 720px;
@@ -55,19 +52,20 @@ st.markdown(f"""
 h1 {{
     text-align: center;
     color: white;
-    font-weight: 700;
 }}
 
 .desc {{
     text-align: center;
     color: #f1f1f1;
-    font-size: 15px;
-    margin-bottom: 20px;
 }}
 
 label {{
     color: white !important;
     font-weight: 600;
+}}
+
+input {{
+    border-radius: 12px !important;
 }}
 
 div.stButton > button {{
@@ -78,18 +76,11 @@ div.stButton > button {{
     padding: 0.7em;
     border-radius: 14px;
     border: none;
-    margin-top: 15px;
 }}
 
 div.stButton > button:hover {{
     transform: scale(1.04);
     box-shadow: 0 0 18px rgba(67,206,162,0.8);
-}}
-
-.stAlert {{
-    border-radius: 14px;
-    font-size: 16px;
-    text-align: center;
 }}
 
 .reco {{
@@ -107,24 +98,14 @@ div.stButton > button:hover {{
     margin-top: 25px;
 }}
 
-@media (max-width: 768px) {{
-    .block-container {{
-        max-width: 95%;
-        margin: 20px auto;
-    }}
-}}
-
 </style>
 """, unsafe_allow_html=True)
 
 # -----------------------------
 # Load Model
 # -----------------------------
-MODEL_PATH = "model/logistic_model.pkl"
-SCALER_PATH = "model/scaler.pkl"
-
-model = joblib.load(MODEL_PATH)
-scaler = joblib.load(SCALER_PATH)
+model = joblib.load("model/logistic_model.pkl")
+scaler = joblib.load("model/scaler.pkl")
 
 # -----------------------------
 # Title
@@ -132,8 +113,7 @@ scaler = joblib.load(SCALER_PATH)
 st.title("🎓 Student Result Prediction System")
 st.markdown("""
 <div class="desc">
-Predict whether a student will <b>Pass or Fail</b><br>
-using <b>Machine Learning (Logistic Regression)</b><br>
+Pass / Fail Prediction using <b>Machine Learning</b><br>
 with <b>Smart Recommendation System</b>
 </div>
 """, unsafe_allow_html=True)
@@ -141,69 +121,80 @@ with <b>Smart Recommendation System</b>
 st.divider()
 
 # -----------------------------
-# Inputs
+# TEXTBOX INPUTS
 # -----------------------------
-study_hours = st.slider("📘 Study Hours per Day", 0.0, 10.0, step=0.1)
-attendance = st.slider("📊 Attendance Percentage", 0.0, 100.0, step=1.0)
+study_hours = st.text_input("📘 Study Hours per Day", placeholder="Enter hours (e.g. 5)")
+attendance = st.text_input("📊 Attendance Percentage", placeholder="Enter % (e.g. 82)")
 
 # -----------------------------
 # Prediction + Recommendation
 # -----------------------------
 if st.button("🔍 Predict Result"):
-    df = pd.DataFrame([[study_hours, attendance]],
-                      columns=["StudyHours", "Attendance"])
 
-    scaled = scaler.transform(df)
-    pred = model.predict(scaled)
-    prob = model.predict_proba(scaled)[0][1]
+    try:
+        study_hours = float(study_hours)
+        attendance = float(attendance)
 
-    st.divider()
+        if study_hours < 0 or attendance < 0 or attendance > 100:
+            st.error("❌ Please enter valid values")
+        else:
+            df = pd.DataFrame([[study_hours, attendance]],
+                              columns=["StudyHours", "Attendance"])
 
-    if pred[0] == 1:
-        st.success("🎉 STUDENT WILL PASS")
-        st.info(f"📈 Pass Probability: {prob*100:.2f}%")
+            scaled = scaler.transform(df)
+            pred = model.predict(scaled)
+            prob = model.predict_proba(scaled)[0][1]
 
-        # ✅ Recommendation (PASS)
-        st.markdown("""
-        <div class="reco">
-        ✅ <b>Recommendations:</b>
-        <ul>
-            <li>Maintain consistent study schedule</li>
-            <li>Revise daily & solve practice questions</li>
-            <li>Keep attendance above 80%</li>
-            <li>Focus on weak subjects to score higher</li>
-        </ul>
-        </div>
-        """, unsafe_allow_html=True)
+            st.divider()
 
-    else:
-        st.error("❌ STUDENT WILL FAIL")
-        st.info(f"📉 Fail Probability: {(1-prob)*100:.2f}%")
+            if pred[0] == 1:
+                st.success("🎉 STUDENT WILL PASS")
+                st.info(f"📈 Pass Probability: {prob*100:.2f}%")
 
-        # ❌ Recommendation (FAIL)
-        tips = []
-        if study_hours < 3:
-            tips.append("Increase study hours to at least 4–5 hours/day")
-        if attendance < 75:
-            tips.append("Improve attendance to minimum 75%")
-        tips.append("Make a daily study timetable")
-        tips.append("Attend doubt-solving sessions")
-        tips.append("Reduce mobile/social media usage")
+                st.markdown("""
+                <div class="reco">
+                ✅ <b>Recommendations:</b>
+                <ul>
+                    <li>Maintain regular study routine</li>
+                    <li>Practice previous year questions</li>
+                    <li>Keep attendance above 80%</li>
+                    <li>Revise weak subjects</li>
+                </ul>
+                </div>
+                """, unsafe_allow_html=True)
 
-        st.markdown("""
-        <div class="reco">
-        ❌ <b>Recommendations to Improve:</b>
-        <ul>
-        """ + "".join([f"<li>{t}</li>" for t in tips]) + """
-        </ul>
-        </div>
-        """, unsafe_allow_html=True)
+            else:
+                st.error("❌ STUDENT WILL FAIL")
+                st.info(f"📉 Fail Probability: {(1-prob)*100:.2f}%")
+
+                tips = []
+                if study_hours < 4:
+                    tips.append("Increase study hours to at least 4–5 hrs/day")
+                if attendance < 75:
+                    tips.append("Improve attendance above 75%")
+                tips += [
+                    "Create a daily timetable",
+                    "Reduce mobile usage",
+                    "Attend doubt-solving sessions"
+                ]
+
+                st.markdown("""
+                <div class="reco">
+                ❌ <b>Recommendations to Improve:</b>
+                <ul>
+                """ + "".join([f"<li>{t}</li>" for t in tips]) + """
+                </ul>
+                </div>
+                """, unsafe_allow_html=True)
+
+    except ValueError:
+        st.error("⚠️ Please enter numeric values only")
 
 # -----------------------------
 # Footer
 # -----------------------------
 st.markdown("""
 <div class="footer">
-Built with ❤️ using Streamlit, Machine Learning & Recommendation System
+Built with ❤️ using Streamlit & Machine Learning
 </div>
 """, unsafe_allow_html=True)
