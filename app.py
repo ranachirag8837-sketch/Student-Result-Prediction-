@@ -31,8 +31,6 @@ def add_bg_image(image_path):
     </style>
     """, unsafe_allow_html=True)
 
-# Call background function
-add_bg_image("background.jpg")
 
 # -----------------------------
 # 🎨 Glass UI CSS
@@ -166,3 +164,4 @@ st.markdown("""
 Built with ❤️ using Streamlit & Machine Learning
 </div>
 """, unsafe_allow_html=True)
+
