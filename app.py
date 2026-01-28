@@ -1,7 +1,6 @@
 import streamlit as st
 import joblib
 import pandas as pd
-import base64
 
 # -----------------------------
 # Page Config
@@ -13,34 +12,21 @@ st.set_page_config(
 )
 
 # -----------------------------
-# Dark / Light Mode Toggle (Centered)
+# Dark / Light Mode Toggle
 # -----------------------------
-c1, c2, c3 = st.columns([3,2,3])
-with c2:
+col1, col2, col3 = st.columns([3,2,3])
+with col2:
     mode = st.toggle("🌙 Dark Mode")
 
 # -----------------------------
-# Load Success Sound (MP3/WAV)
-# -----------------------------
-def play_sound():
-    audio_file = open("success.mp3", "rb")  # put success.mp3 in same folder
-    audio_bytes = audio_file.read()
-    b64 = base64.b64encode(audio_bytes).decode()
-    st.markdown(f"""
-    <audio autoplay>
-        <source src="data:audio/mp3;base64,{b64}" type="audio/mp3">
-    </audio>
-    """, unsafe_allow_html=True)
-
-# -----------------------------
-# CSS Styling
+# CSS + Animated Background
 # -----------------------------
 st.markdown(f"""
 <style>
 
 .stApp {{
     background: linear-gradient(-45deg,
-        {'#0f2027, #203a43, #2c5364' if mode else '#667eea, #764ba2, #43cea2'}
+        {'#1f1c2c, #928DAB' if mode else '#667eea, #764ba2'}
     );
     background-size: 400% 400%;
     animation: gradientBG 15s ease infinite;
@@ -54,13 +40,13 @@ st.markdown(f"""
 }}
 
 .block-container {{
-    background: {'rgba(0,0,0,0.45)' if mode else 'rgba(255,255,255,0.22)'};
-    backdrop-filter: blur(16px);
+    background: rgba(255,255,255,0.18);
+    backdrop-filter: blur(18px);
     padding: 2rem;
-    border-radius: 20px;
+    border-radius: 22px;
     max-width: 720px;
     margin: 40px auto;
-    box-shadow: 0 10px 35px rgba(0,0,0,0.35);
+    box-shadow: 0 10px 40px rgba(0,0,0,0.35);
 }}
 
 h1 {{
@@ -75,7 +61,36 @@ h1 {{
 
 label {{
     color: white !important;
+}}
+
+.result-card {{
+    background: rgba(120,130,200,0.45);
+    padding: 18px;
+    border-radius: 16px;
+    margin-top: 15px;
+    font-size: 18px;
     font-weight: 600;
+    color: #00ffcc;
+}}
+
+.prob-card {{
+    background: rgba(140,150,220,0.45);
+    padding: 14px;
+    border-radius: 14px;
+    margin-top: 12px;
+    color: #e6f0ff;
+}}
+
+.fail {{
+    color: #ff6b6b;
+}}
+
+.reco {{
+    background: rgba(255,255,255,0.15);
+    padding: 15px;
+    border-radius: 14px;
+    margin-top: 15px;
+    color: white;
 }}
 
 div.stButton > button {{
@@ -86,46 +101,6 @@ div.stButton > button {{
     padding: 0.7em;
     border-radius: 14px;
     border: none;
-}}
-
-div.stButton > button:hover {{
-    transform: scale(1.04);
-    box-shadow: 0 0 18px rgba(67,206,162,0.8);
-}}
-
-/* 🎉 PASS Celebration */
-.pass-card {{
-    background: linear-gradient(135deg, #00f260, #0575e6);
-    padding: 22px;
-    border-radius: 18px;
-    text-align: center;
-    font-size: 22px;
-    font-weight: 700;
-    color: white;
-    animation: pop 0.6s ease-out;
-    box-shadow: 0 0 30px rgba(0,255,200,0.8);
-}}
-
-@keyframes pop {{
-    0% {{ transform: scale(0.7); opacity: 0; }}
-    100% {{ transform: scale(1); opacity: 1; }}
-}}
-
-.prob-card {{
-    background: rgba(255,255,255,0.25);
-    padding: 14px;
-    border-radius: 14px;
-    margin-top: 14px;
-    color: white;
-    text-align: center;
-}}
-
-.reco {{
-    background: rgba(255,255,255,0.15);
-    padding: 15px;
-    border-radius: 14px;
-    margin-top: 15px;
-    color: white;
 }}
 
 .footer {{
@@ -151,17 +126,17 @@ st.title("🎓 Student Result Prediction System")
 st.markdown("""
 <div class="desc">
 Pass / Fail Prediction<br>
-with <b>Celebration + Recommendation System</b>
+<b>with Smart Recommendation System</b>
 </div>
 """, unsafe_allow_html=True)
 
 st.divider()
 
 # -----------------------------
-# Text Inputs
+# Inputs (Textbox)
 # -----------------------------
 study_hours = st.text_input("📘 Study Hours per Day", placeholder="e.g. 5")
-attendance = st.text_input("📊 Attendance Percentage", placeholder="e.g. 85")
+attendance = st.text_input("📊 Attendance Percentage", placeholder="e.g. 80")
 
 # -----------------------------
 # Prediction
@@ -172,7 +147,7 @@ if st.button("🔍 Predict Result"):
         attendance = float(attendance)
 
         if study_hours < 0 or attendance < 0 or attendance > 100:
-            st.error("❌ Invalid input values")
+            st.error("❌ Enter valid values")
         else:
             df = pd.DataFrame([[study_hours, attendance]],
                               columns=["StudyHours", "Attendance"])
@@ -183,18 +158,13 @@ if st.button("🔍 Predict Result"):
             st.divider()
 
             if pred[0] == 1:
-                play_sound()  # 🔊 SUCCESS SOUND
-
                 st.markdown(f"""
-                <div class="pass-card">
-                    🎉🎊 STUDENT WILL PASS 🎊🎉<br>
-                    <span style="font-size:14px;font-weight:400;">
-                    Excellent performance! Keep it up 🚀
-                    </span>
+                <div class="result-card">
+                🎉 STUDENT WILL PASS
                 </div>
 
                 <div class="prob-card">
-                    📈 <b>Pass Probability:</b> {prob*100:.2f}%
+                📈 Pass Probability: <b>{prob*100:.2f}%</b>
                 </div>
                 """, unsafe_allow_html=True)
 
@@ -202,18 +172,38 @@ if st.button("🔍 Predict Result"):
                 <div class="reco">
                 ✅ <b>Recommendations:</b>
                 <ul>
-                    <li>Maintain consistent study habits</li>
+                    <li>Maintain regular study routine</li>
                     <li>Practice mock tests</li>
                     <li>Keep attendance above 80%</li>
+                    <li>Focus on weak subjects</li>
                 </ul>
                 </div>
                 """, unsafe_allow_html=True)
 
             else:
-                st.error("❌ STUDENT WILL FAIL")
-                st.info(f"📉 Fail Probability: {(1-prob)*100:.2f}%")
+                st.markdown(f"""
+                <div class="result-card fail">
+                ❌ STUDENT WILL FAIL
+                </div>
 
-    except:
+                <div class="prob-card">
+                📉 Fail Probability: <b>{(1-prob)*100:.2f}%</b>
+                </div>
+                """, unsafe_allow_html=True)
+
+                st.markdown("""
+                <div class="reco">
+                ❌ <b>Recommendations to Improve:</b>
+                <ul>
+                    <li>Increase study hours to 4–5 hrs/day</li>
+                    <li>Improve attendance above 75%</li>
+                    <li>Create daily study timetable</li>
+                    <li>Avoid distractions</li>
+                </ul>
+                </div>
+                """, unsafe_allow_html=True)
+
+    except ValueError:
         st.error("⚠️ Please enter numeric values only")
 
 # -----------------------------
