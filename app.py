@@ -140,7 +140,7 @@ st.divider()
 # Inputs
 # -----------------------------
 study_hours = st.text_input("📘 Study Hours per Day", placeholder="Enter your Hours")
-attendance = st.text_input("📊 Attendance Percentage", placeholder="Enter your Attendanc")
+attendance = st.text_input("📊 Attendance Percentage", placeholder="Enter your Attendance (%)")
 
 # -----------------------------
 # Prediction
@@ -168,11 +168,29 @@ if st.button("🔍 Predict Result"):
                 st.markdown("""
                 <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
                 <script>
-                confetti({
-                    particleCount: 250,
-                    spread: 120,
-                    origin: { y: 0.6 }
-                });
+                // Make confetti continuously for 3 seconds
+                let duration = 3 * 1000;
+                let animationEnd = Date.now() + duration;
+                let defaults = { startVelocity: 30, spread: 360, ticks: 60, zIndex: 2000 };
+
+                function randomInRange(min, max) {
+                  return Math.random() * (max - min) + min;
+                }
+
+                let interval = setInterval(function() {
+                  let timeLeft = animationEnd - Date.now();
+
+                  if (timeLeft <= 0) {
+                    return clearInterval(interval);
+                  }
+
+                  let particleCount = 50 * (timeLeft / duration);
+                  // since particles fall down, start a bit higher than 0.6
+                  confetti(Object.assign({}, defaults, {
+                    particleCount,
+                    origin: { x: Math.random(), y: Math.random() - 0.2 }
+                  }));
+                }, 250);
                 </script>
                 """, unsafe_allow_html=True)
 
@@ -233,5 +251,3 @@ st.markdown("""
 Built with ❤️ using Streamlit
 </div>
 """, unsafe_allow_html=True)
-
-
