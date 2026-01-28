@@ -139,8 +139,8 @@ st.divider()
 # -----------------------------
 # Inputs
 # -----------------------------
-study_hours = st.text_input("📘 Study Hours per Day", placeholder="e.g. 5")
-attendance = st.text_input("📊 Attendance Percentage", placeholder="e.g. 80")
+study_hours = st.text_input("📘 Study Hours per Day", placeholder="Enter your Hours")
+attendance = st.text_input("📊 Attendance Percentage", placeholder="Enter your Attendanc")
 
 # -----------------------------
 # Prediction
@@ -233,4 +233,5 @@ st.markdown("""
 Built with ❤️ using Streamlit
 </div>
 """, unsafe_allow_html=True)
+
 
