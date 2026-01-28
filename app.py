@@ -12,21 +12,21 @@ st.set_page_config(
 )
 
 # -----------------------------
-# Dark / Light Mode Toggle (Centered)
+# Dark / Light Mode Toggle
 # -----------------------------
 col1, col2, col3 = st.columns([3,2,3])
 with col2:
     mode = st.toggle("🌙 Dark Mode")
 
 # -----------------------------
-# Animated Background + CSS
+# CSS + Animated Background
 # -----------------------------
 st.markdown(f"""
 <style>
 
 .stApp {{
     background: linear-gradient(-45deg,
-        {'#0f2027, #203a43, #2c5364' if mode else '#667eea, #764ba2, #43cea2'}
+        {'#1f1c2c, #928DAB' if mode else '#667eea, #764ba2'}
     );
     background-size: 400% 400%;
     animation: gradientBG 15s ease infinite;
@@ -40,13 +40,13 @@ st.markdown(f"""
 }}
 
 .block-container {{
-    background: {'rgba(0,0,0,0.45)' if mode else 'rgba(255,255,255,0.22)'};
-    backdrop-filter: blur(16px);
+    background: rgba(255,255,255,0.18);
+    backdrop-filter: blur(18px);
     padding: 2rem;
-    border-radius: 20px;
+    border-radius: 22px;
     max-width: 720px;
     margin: 40px auto;
-    box-shadow: 0 10px 35px rgba(0,0,0,0.35);
+    box-shadow: 0 10px 40px rgba(0,0,0,0.35);
 }}
 
 h1 {{
@@ -61,11 +61,36 @@ h1 {{
 
 label {{
     color: white !important;
-    font-weight: 600;
 }}
 
-input {{
-    border-radius: 12px !important;
+.result-card {{
+    background: rgba(120,130,200,0.45);
+    padding: 18px;
+    border-radius: 16px;
+    margin-top: 15px;
+    font-size: 18px;
+    font-weight: 600;
+    color: #00ffcc;
+}}
+
+.prob-card {{
+    background: rgba(140,150,220,0.45);
+    padding: 14px;
+    border-radius: 14px;
+    margin-top: 12px;
+    color: #e6f0ff;
+}}
+
+.fail {{
+    color: #ff6b6b;
+}}
+
+.reco {{
+    background: rgba(255,255,255,0.15);
+    padding: 15px;
+    border-radius: 14px;
+    margin-top: 15px;
+    color: white;
 }}
 
 div.stButton > button {{
@@ -76,19 +101,6 @@ div.stButton > button {{
     padding: 0.7em;
     border-radius: 14px;
     border: none;
-}}
-
-div.stButton > button:hover {{
-    transform: scale(1.04);
-    box-shadow: 0 0 18px rgba(67,206,162,0.8);
-}}
-
-.reco {{
-    background: rgba(255,255,255,0.15);
-    padding: 15px;
-    border-radius: 14px;
-    margin-top: 15px;
-    color: white;
 }}
 
 .footer {{
@@ -114,33 +126,31 @@ st.title("🎓 Student Result Prediction System")
 st.markdown("""
 <div class="desc">
 Pass / Fail Prediction<br>
-with <b>Smart Recommendation System</b>
+<b>with Smart Recommendation System</b>
 </div>
 """, unsafe_allow_html=True)
 
 st.divider()
 
 # -----------------------------
-# TEXTBOX INPUTS
+# Inputs (Textbox)
 # -----------------------------
-study_hours = st.text_input("📘 Study Hours per Day", placeholder="Enter hours (e.g. 5)")
-attendance = st.text_input("📊 Attendance Percentage", placeholder="Enter % (e.g. 82)")
+study_hours = st.text_input("📘 Study Hours per Day", placeholder="e.g. 5")
+attendance = st.text_input("📊 Attendance Percentage", placeholder="e.g. 80")
 
 # -----------------------------
-# Prediction + Recommendation
+# Prediction
 # -----------------------------
 if st.button("🔍 Predict Result"):
-
     try:
         study_hours = float(study_hours)
         attendance = float(attendance)
 
         if study_hours < 0 or attendance < 0 or attendance > 100:
-            st.error("❌ Please enter valid values")
+            st.error("❌ Enter valid values")
         else:
             df = pd.DataFrame([[study_hours, attendance]],
                               columns=["StudyHours", "Attendance"])
-
             scaled = scaler.transform(df)
             pred = model.predict(scaled)
             prob = model.predict_proba(scaled)[0][1]
@@ -148,41 +158,47 @@ if st.button("🔍 Predict Result"):
             st.divider()
 
             if pred[0] == 1:
-                st.success("🎉 STUDENT WILL PASS")
-                st.info(f"📈 Pass Probability: {prob*100:.2f}%")
+                st.markdown(f"""
+                <div class="result-card">
+                🎉 STUDENT WILL PASS
+                </div>
+
+                <div class="prob-card">
+                📈 Pass Probability: <b>{prob*100:.2f}%</b>
+                </div>
+                """, unsafe_allow_html=True)
 
                 st.markdown("""
                 <div class="reco">
                 ✅ <b>Recommendations:</b>
                 <ul>
                     <li>Maintain regular study routine</li>
-                    <li>Practice previous year questions</li>
+                    <li>Practice mock tests</li>
                     <li>Keep attendance above 80%</li>
-                    <li>Revise weak subjects</li>
+                    <li>Focus on weak subjects</li>
                 </ul>
                 </div>
                 """, unsafe_allow_html=True)
 
             else:
-                st.error("❌ STUDENT WILL FAIL")
-                st.info(f"📉 Fail Probability: {(1-prob)*100:.2f}%")
+                st.markdown(f"""
+                <div class="result-card fail">
+                ❌ STUDENT WILL FAIL
+                </div>
 
-                tips = []
-                if study_hours < 4:
-                    tips.append("Increase study hours to at least 4–5 hrs/day")
-                if attendance < 75:
-                    tips.append("Improve attendance above 75%")
-                tips += [
-                    "Create a daily timetable",
-                    "Reduce mobile usage",
-                    "Attend doubt-solving sessions"
-                ]
+                <div class="prob-card">
+                📉 Fail Probability: <b>{(1-prob)*100:.2f}%</b>
+                </div>
+                """, unsafe_allow_html=True)
 
                 st.markdown("""
                 <div class="reco">
                 ❌ <b>Recommendations to Improve:</b>
                 <ul>
-                """ + "".join([f"<li>{t}</li>" for t in tips]) + """
+                    <li>Increase study hours to 4–5 hrs/day</li>
+                    <li>Improve attendance above 75%</li>
+                    <li>Create daily study timetable</li>
+                    <li>Avoid distractions</li>
                 </ul>
                 </div>
                 """, unsafe_allow_html=True)
@@ -195,8 +211,6 @@ if st.button("🔍 Predict Result"):
 # -----------------------------
 st.markdown("""
 <div class="footer">
-Built with ❤️ using Streamlit 
+Built with ❤️ using Streamlit & Machine Learning
 </div>
 """, unsafe_allow_html=True)
-
-
