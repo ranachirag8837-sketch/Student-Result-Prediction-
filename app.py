@@ -113,7 +113,7 @@ scaler = joblib.load("model/scaler.pkl")
 st.title("🎓 Student Result Prediction System")
 st.markdown("""
 <div class="desc">
-Pass / Fail Prediction using <b>Machine Learning</b><br>
+Pass / Fail Prediction<br>
 with <b>Smart Recommendation System</b>
 </div>
 """, unsafe_allow_html=True)
@@ -198,3 +198,4 @@ st.markdown("""
 Built with ❤️ using Streamlit & Machine Learning
 </div>
 """, unsafe_allow_html=True)
+
