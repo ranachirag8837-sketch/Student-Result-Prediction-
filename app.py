@@ -195,7 +195,8 @@ if st.button("🔍 Predict Result"):
 # -----------------------------
 st.markdown("""
 <div class="footer">
-Built with ❤️ using Streamlit & Machine Learning
+Built with ❤️ using Streamlit 
 </div>
 """, unsafe_allow_html=True)
+
 
