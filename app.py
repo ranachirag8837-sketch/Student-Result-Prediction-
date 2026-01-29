@@ -82,48 +82,49 @@ st.markdown("""
 st.divider()
 
 # =============================
-# User Inputs – Textboxes
+# User Inputs – Textboxes (allow empty)
 # =============================
-study_hours = st.number_input(
-    "📘 Study Hours (per day)",
-    min_value=0.0,
-    max_value=24.0,
-    value=4.0,
-    step=0.1
-)
+study_hours_input = st.text_input("📘 Study Hours (per day)", value="")
+attendance_input = st.text_input("📊 Attendance (%)", value="")
 
-attendance = st.number_input(
-    "📊 Attendance (%)",
-    min_value=0.0,
-    max_value=100.0,
-    value=75.0,
-    step=1.0
-)
+# Convert inputs to float, handle empty input
+try:
+    study_hours = float(study_hours_input) if study_hours_input.strip() != "" else None
+except:
+    study_hours = None
+
+try:
+    attendance = float(attendance_input) if attendance_input.strip() != "" else None
+except:
+    attendance = None
 
 # =============================
 # Prediction
 # =============================
 if st.button("🔍 Predict Result"):
-
-    input_data = pd.DataFrame(
-        [[study_hours, attendance]],
-        columns=["StudyHours", "Attendance"]
-    )
-
-    input_scaled = scaler.transform(input_data)
-
-    pass_probability = logistic_model.predict_proba(input_scaled)[0][1]
-    predicted_marks = linear_model.predict(input_scaled)[0]
-
-    st.divider()
-
-    if pass_probability >= 0.5 and predicted_marks >= 40:
-        st.success("🎉 RESULT: **PASS**")
+    
+    if study_hours is None or attendance is None:
+        st.warning("⚠️ Please enter both Study Hours and Attendance before predicting.")
     else:
-        st.error("❌ RESULT: **FAIL**")
+        input_data = pd.DataFrame(
+            [[study_hours, attendance]],
+            columns=["StudyHours", "Attendance"]
+        )
 
-    st.info(f"📈 Pass Probability: **{pass_probability * 100:.2f}%**")
-    st.info(f"📝 Predicted Marks: **{predicted_marks:.2f} / 100**")
+        input_scaled = scaler.transform(input_data)
+
+        pass_probability = logistic_model.predict_proba(input_scaled)[0][1]
+        predicted_marks = linear_model.predict(input_scaled)[0]
+
+        st.divider()
+
+        if pass_probability >= 0.5 and predicted_marks >= 40:
+            st.success("🎉 RESULT: **PASS**")
+        else:
+            st.error("❌ RESULT: **FAIL**")
+
+        st.info(f"📈 Pass Probability: **{pass_probability * 100:.2f}%**")
+        st.info(f"📝 Predicted Marks: **{predicted_marks:.2f} / 100**")
 
 # =============================
 # Footer
