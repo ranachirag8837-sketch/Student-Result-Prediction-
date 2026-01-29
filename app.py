@@ -15,7 +15,7 @@ st.set_page_config(
 )
 
 # =============================
-# Custom CSS for Theme & Border
+# Custom CSS for Theme & Bordered Info Section
 # =============================
 st.markdown("""
 <style>
@@ -23,6 +23,17 @@ st.markdown("""
     .stApp {
         background-color: #4B0082;
         color: white;
+    }
+
+    /* Info Border Container (Includes Header + Inputs) */
+    .info-border-box {
+        border: 2px solid rgba(255, 255, 255, 0.3);
+        border-radius: 25px;
+        padding: 40px;
+        background-color: rgba(255, 255, 255, 0.05);
+        margin-top: 20px;
+        margin-bottom: 20px;
+        text-align: center;
     }
 
     /* Centering labels */
@@ -58,15 +69,6 @@ st.markdown("""
         border: none;
         font-weight: bold;
     }
-
-    /* Input Border Container */
-    .input-border-box {
-        border: 2px solid rgba(255, 255, 255, 0.3);
-        border-radius: 25px;
-        padding: 40px;
-        background-color: rgba(255, 255, 255, 0.05);
-        margin-bottom: 20px;
-    }
 </style>
 """, unsafe_allow_html=True)
 
@@ -88,35 +90,32 @@ logistic_model = LogisticRegression().fit(X_scaled, df["ResultNumeric"])
 linear_model = LinearRegression().fit(X_scaled, df["TotalMarks"])
 
 # =============================
-# Header Section
-# =============================
-st.markdown("""
-    <div style="text-align: center; padding: 40px 0 10px 0;">
-        <h1 style="font-size: 3.5rem; font-weight: 800; color: white; margin-bottom: 0;">🎓 Student Result Prediction</h1>
-        <p style="color: rgba(255,255,255,0.7); margin-bottom: 30px; font-size: 1.1rem;">
-            🔹 Hybrid ML Model: Logistic Regression & Linear Regression
-        </p>
-    </div>
-""", unsafe_allow_html=True)
-
-# =============================
-# Bordered Input Section
+# Main Layout
 # =============================
 col_left, col_mid, col_right = st.columns([1, 2, 1])
 
 with col_mid:
-    # Opening the Bordered Div
-    st.markdown('<div class="input-border-box">', unsafe_allow_html=True)
+    # START OF BORDERED BOX (Contains everything before Result)
+    st.markdown('<div class="info-border-box">', unsafe_allow_html=True)
     
+    # Header inside the border
+    st.markdown("""
+        <h1 style="font-size: 3.5rem; font-weight: 800; color: white; margin-bottom: 0;">🎓 Student Result Prediction</h1>
+        <p style="color: rgba(255,255,255,0.7); margin-bottom: 30px; font-size: 1.1rem;">
+            🔹 Hybrid ML Model: Logistic Regression & Linear Regression
+        </p>
+    """, unsafe_allow_html=True)
+
+    # Inputs inside the border
     study_hours_input = st.text_input("📘 Study Hours (per day)", value="9")
     attendance_input = st.text_input("📊 Attendance (%)", value="80")
     predict_clicked = st.button("🌟 Predict Result")
     
-    # Closing the Bordered Div
+    # END OF BORDERED BOX
     st.markdown('</div>', unsafe_allow_html=True)
 
 # =============================
-# Prediction Logic
+# Prediction Logic (Outside the border)
 # =============================
 if predict_clicked:
     try:
