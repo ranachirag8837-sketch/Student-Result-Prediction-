@@ -15,45 +15,57 @@ st.set_page_config(
 )
 
 # =============================
-# Custom CSS for Black Theme & Transparency
+# Custom CSS for Theme & Border
 # =============================
 st.markdown("""
 <style>
-    /* Global Black Background */
+    /* Global Background (Purple) */
     .stApp {
         background-color: #4B0082;
         color: white;
     }
 
-    /* Centering the inputs and labels */
+    /* Centering labels */
     .stTextInput > label {
         display: flex;
         justify-content: center;
         color: #ffffff !important;
         font-weight: bold;
+        margin-bottom: 10px;
     }
 
-    /* Style for Input Boxes (Semi-transparent) */
+    /* Input Box Styling */
     .stTextInput > div > div > input {
-        background-color: rgba(255, 255, 255, 0.1) !important;
+        background-color: rgba(255, 255, 255, 0.9) !important;
         color: black !important;
-        border: 1px solid #444 !important;
+        border: 2px solid #ffffff !important;
         text-align: center;
-        border-radius: 10px;
+        border-radius: 12px;
+        height: 45px;
     }
 
-    /* Center the Predict button */
+    /* Predict Button Container */
     div.stButton {
         text-align: center;
-        margin-top: 20px;
+        margin-top: 25px;
     }
 
     .stButton > button {
         background-color: #3b82f6 !important;
         color: white !important;
-        border-radius: 10px;
-        padding: 0.5rem 2rem;
+        border-radius: 12px;
+        padding: 0.6rem 2.5rem;
         border: none;
+        font-weight: bold;
+    }
+
+    /* Input Border Container */
+    .input-border-box {
+        border: 2px solid rgba(255, 255, 255, 0.3);
+        border-radius: 25px;
+        padding: 40px;
+        background-color: rgba(255, 255, 255, 0.05);
+        margin-bottom: 20px;
     }
 </style>
 """, unsafe_allow_html=True)
@@ -61,7 +73,6 @@ st.markdown("""
 # =============================
 # Load Dataset & Training
 # =============================
-# Using dummy data if file is missing
 df = pd.DataFrame({
     "StudyHours": [1,2,3,4,5,6,7,8],
     "Attendance": [45,50,55,60,70,80,90,95],
@@ -77,29 +88,32 @@ logistic_model = LogisticRegression().fit(X_scaled, df["ResultNumeric"])
 linear_model = LinearRegression().fit(X_scaled, df["TotalMarks"])
 
 # =============================
-# Centered Header Section
+# Header Section
 # =============================
 st.markdown("""
     <div style="text-align: center; padding: 40px 0 10px 0;">
-        <h1 style="font-size: 3rem; font-weight: 800; color: white;">🎓 Student Result Prediction</h1>
-        <p style="color: #94a3b8; margin-bottom: 30px;">
+        <h1 style="font-size: 3.5rem; font-weight: 800; color: white; margin-bottom: 0;">🎓 Student Result Prediction</h1>
+        <p style="color: rgba(255,255,255,0.7); margin-bottom: 30px; font-size: 1.1rem;">
             🔹 Hybrid ML Model: Logistic Regression & Linear Regression
         </p>
     </div>
 """, unsafe_allow_html=True)
 
 # =============================
-# Centered Vertical Input Section
+# Bordered Input Section
 # =============================
-# Creating columns to pinch the center for vertical stacking
-col_left, col_mid, col_right = st.columns([1, 1.5, 1])
+col_left, col_mid, col_right = st.columns([1, 2, 1])
 
 with col_mid:
-    # Attendance is now at the bottom of Study Hours
-    study_hours_input = st.text_input("📘 Study Hours (per day)", value="10")
-    attendance_input = st.text_input("📊 Attendance (%)", value="100")
+    # Opening the Bordered Div
+    st.markdown('<div class="input-border-box">', unsafe_allow_html=True)
     
+    study_hours_input = st.text_input("📘 Study Hours (per day)", value="9")
+    attendance_input = st.text_input("📊 Attendance (%)", value="80")
     predict_clicked = st.button("🌟 Predict Result")
+    
+    # Closing the Bordered Div
+    st.markdown('</div>', unsafe_allow_html=True)
 
 # =============================
 # Prediction Logic
@@ -115,7 +129,6 @@ if predict_clicked:
         pass_prob = logistic_model.predict_proba(input_scaled)[0][1]
         pred_marks = min(float(linear_model.predict(input_scaled)[0]), 100.0)
 
-        # HTML Result Card with Transparent Backdrop Blur
         html_code = f"""
         <html>
         <head>
@@ -123,29 +136,29 @@ if predict_clicked:
           <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
         </head>
         <body class="bg-transparent flex justify-center">
-          <div class="max-w-xl w-full mt-10">
+          <div class="max-w-xl w-full">
             <div class="bg-white/10 backdrop-blur-lg rounded-3xl p-8 text-center border border-white/20 shadow-2xl">
               <h2 class="text-3xl font-bold mb-6 text-white">Result</h2>
-              <div class="space-y-2 mb-6">
-                <p class="text-xl text-gray-200">Pass Probability: <span class="font-bold text-blue-400">{pass_prob*100:.2f}%</span></p>
-                <p class="text-xl text-gray-200">Predicted Marks: <span class="font-bold text-blue-400">{pred_marks:.2f} / 100</span></p>
+              <div class="space-y-2 mb-6 text-white">
+                <p class="text-xl">Pass Probability: <span class="font-bold text-blue-300">{pass_prob*100:.2f}%</span></p>
+                <p class="text-xl">Predicted Marks: <span class="font-bold text-blue-300">{pred_marks:.2f} / 100</span></p>
               </div>
         """
 
         if pass_prob >= 0.5:
             html_code += f"""
-              <div class="text-green-400 font-black text-3xl mb-6">🎉 RESULT: PASS</div>
+              <div class="text-green-400 font-black text-4xl mb-6">🎉 RESULT: PASS</div>
               <script>
                 confetti({{ particleCount: 150, spread: 70, origin: {{ y: 0.6 }} }});
               </script>
             """
         else:
-            html_code += '<div class="text-red-400 font-black text-3xl mb-6">❌ RESULT: FAIL</div>'
+            html_code += '<div class="text-red-400 font-black text-4xl mb-6">❌ RESULT: FAIL</div>'
 
         html_code += f"""
-              <div class="bg-black/30 p-4 rounded-xl text-left border border-white/10">
-                <h3 class="font-bold text-white mb-1">💡 Recommendation:</h3>
-                <p class="text-gray-300">{"Keep up the excellent work!" if pred_marks > 70 else "Focus on consistency to improve marks."}</p>
+              <div class="bg-black/40 p-5 rounded-2xl text-left border border-white/10">
+                <h3 class="font-bold text-white mb-2 italic">📍 Recommendation:</h3>
+                <p class="text-gray-200">{"Keep up the excellent work!" if pred_marks > 70 else "Focus on consistency to improve marks."}</p>
               </div>
             </div>
           </div>
@@ -154,7 +167,7 @@ if predict_clicked:
         """
 
         with col_mid:
-            components.html(html_code, height=500)
+            components.html(html_code, height=520)
             
     except ValueError:
         st.error("⚠️ Please enter valid numeric values.")
@@ -162,7 +175,4 @@ if predict_clicked:
 # =============================
 # Footer
 # =============================
-st.markdown("<br><center><p style='color: #fff;'>Built with ❤️ | Dark Mode Active</p></center>", unsafe_allow_html=True)
-
-
-
+st.markdown("<br><center><p style='color: white; opacity: 0.8;'>Built with ❤️ | Dark Mode Active</p></center>", unsafe_allow_html=True)
