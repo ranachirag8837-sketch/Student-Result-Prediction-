@@ -21,7 +21,7 @@ st.markdown("""
 <style>
     /* Global Black Background */
     .stApp {
-        background-color: #000000;
+        background-color: #4B0082;
         color: white;
     }
 
@@ -163,4 +163,5 @@ if predict_clicked:
 # Footer
 # =============================
 st.markdown("<br><center><p style='color: #444;'>Built with ❤️ | Dark Mode Active</p></center>", unsafe_allow_html=True)
+
 
