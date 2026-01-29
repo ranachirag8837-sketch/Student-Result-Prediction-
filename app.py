@@ -1,6 +1,5 @@
 import streamlit as st
 import os
-import joblib
 import pandas as pd
 import numpy as np
 
@@ -17,15 +16,12 @@ st.set_page_config(
 )
 
 # -----------------------------
-# Paths
-# -----------------------------
-ROOT_DIR = os.path.abspath(os.path.dirname(__file__))
-DATA_PATH = os.path.join(ROOT_DIR, "data", "student_data.csv")
-
-# -----------------------------
-# Load / Upload / Create Data
+# Load / Upload Dataset
 # -----------------------------
 st.sidebar.header("📁 Dataset")
+
+ROOT_DIR = os.path.abspath(os.path.dirname(__file__))
+DATA_PATH = os.path.join(ROOT_DIR, "data", "student_data.csv")
 
 if os.path.exists(DATA_PATH):
     df = pd.read_csv(DATA_PATH)
@@ -42,15 +38,34 @@ else:
         st.sidebar.success("CSV uploaded successfully")
 
     else:
-        st.sidebar.warning("CSV not found. Using sample dataset.")
-
-        # Sample dataset (FAIL SAFE)
+        st.sidebar.warning("CSV not found. Using sample data.")
         df = pd.DataFrame({
-            "StudyHours": [1, 2, 3, 4, 5, 6, 7, 8],
-            "Attendance": [40, 50, 55, 60, 70, 80, 90, 95],
-            "ResultNumeric": [0, 0, 0, 1, 1, 1, 1, 1],
-            "TotalMarks": [30, 35, 40, 45, 60, 70, 85, 90]
+            "StudyHours": [1,2,3,4,5,6,7,8],
+            "Attendance": [45,50,55,60,70,80,90,95],
+            "ResultNumeric": [0,0,0,1,1,1,1,1]
         })
+
+# -----------------------------
+# REQUIRED COLUMNS CHECK
+# -----------------------------
+required_cols = ["StudyHours", "Attendance", "ResultNumeric"]
+
+for col in required_cols:
+    if col not in df.columns:
+        st.error(f"❌ Missing required column: {col}")
+        st.stop()
+
+# -----------------------------
+# HANDLE TotalMarks SAFELY
+# -----------------------------
+if "TotalMarks" not in df.columns:
+    st.warning("⚠️ 'TotalMarks' column not found. Auto-generating marks.")
+
+    df["TotalMarks"] = (
+        df["StudyHours"] * 10 +
+        df["Attendance"] * 0.5 +
+        np.random.normal(0, 5, len(df))
+    ).clip(0, 100)
 
 # -----------------------------
 # Features & Targets
@@ -82,7 +97,7 @@ This system uses a **Hybrid Machine Learning Model**:
 - **Logistic Regression** → Pass / Fail  
 - **Linear Regression** → Marks Prediction  
 
-The model is trained **live** to avoid deployment issues.
+The system automatically adapts to your dataset.
 """)
 
 st.divider()
