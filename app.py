@@ -1,241 +1,102 @@
 import streamlit as st
 import joblib
+import os
 import pandas as pd
-import streamlit.components.v1 as components  # For JS confetti
+import numpy as np
 
 # -----------------------------
-# Page Config
+# Page config
 # -----------------------------
 st.set_page_config(
-    page_title="Student Result Prediction",
+    page_title="Student Result Prediction (Hybrid)",
     page_icon="🎓",
     layout="centered"
 )
 
 # -----------------------------
-# Dark / Light Mode Toggle
+# Load models & scaler
 # -----------------------------
-col1, col2, col3 = st.columns([3, 2, 3])
-with col2:
-    mode = st.toggle("🌙 Dark Mode")
+ROOT_DIR = os.path.abspath(os.path.dirname(__file__))
 
-# -----------------------------
-# CSS + Animated Background
-# -----------------------------
-st.markdown(f"""
-<style>
+MODEL_DIR = os.path.join(ROOT_DIR, "model")
 
-.stApp {{
-    background: linear-gradient(-45deg,
-        {'#1f1c2c, #928DAB' if mode else '#667eea, #764ba2'}
-    );
-    background-size: 400% 400%;
-    animation: gradientBG 15s ease infinite;
-    font-family: 'Segoe UI', sans-serif;
-}}
+LOGISTIC_PATH = os.path.join(MODEL_DIR, "hybrid_logistic.pkl")
+LINEAR_PATH = os.path.join(MODEL_DIR, "hybrid_linear.pkl")
+SCALER_PATH = os.path.join(MODEL_DIR, "hybrid_scaler.pkl")
 
-@keyframes gradientBG {{
-    0% {{ background-position: 0% 50%; }}
-    50% {{ background-position: 100% 50%; }}
-    100% {{ background-position: 0% 50%; }}
-}}
+if not (os.path.exists(LOGISTIC_PATH) and os.path.exists(LINEAR_PATH)):
+    st.error("❌ Hybrid models not found. Train the hybrid model first.")
+    st.stop()
 
-.block-container {{
-    background: rgba(255,255,255,0.18);
-    backdrop-filter: blur(18px);
-    padding: 2rem;
-    border-radius: 22px;
-    max-width: 720px;
-    margin: 40px auto;
-    box-shadow: 0 10px 40px rgba(0,0,0,0.35);
-}}
-
-h1 {{
-    text-align: center;
-    color: white;
-}}
-
-.desc {{
-    text-align: center;
-    color: #f1f1f1;
-}}
-
-label {{
-    color: white !important;
-}}
-
-.result-card {{
-    background: linear-gradient(135deg, #00f260, #0575e6);
-    padding: 22px;
-    border-radius: 18px;
-    margin-top: 15px;
-    font-size: 22px;
-    font-weight: 700;
-    color: white;
-    text-align: center;
-    box-shadow: 0 0 25px rgba(0,255,200,0.8);
-}}
-
-.prob-card {{
-    background: rgba(140,150,220,0.45);
-    padding: 14px;
-    border-radius: 14px;
-    margin-top: 12px;
-    color: #e6f0ff;
-    text-align: center;
-}}
-
-.fail {{
-    background: rgba(255,90,90,0.35);
-    color: #ffdddd;
-}}
-
-.reco {{
-    background: rgba(255,255,255,0.15);
-    padding: 15px;
-    border-radius: 14px;
-    margin-top: 15px;
-    color: white;
-}}
-
-div.stButton > button {{
-    width: 100%;
-    background: linear-gradient(to right, #43cea2, #185a9d);
-    color: white;
-    font-size: 17px;
-    padding: 0.7em;
-    border-radius: 14px;
-    border: none;
-}}
-
-.footer {{
-    text-align: center;
-    color: #dddddd;
-    font-size: 13px;
-    margin-top: 25px;
-}}
-
-</style>
-""", unsafe_allow_html=True)
+hybrid_logistic = joblib.load(LOGISTIC_PATH)
+hybrid_linear = joblib.load(LINEAR_PATH)
+scaler = joblib.load(SCALER_PATH)
 
 # -----------------------------
-# Load Model
+# Title & description
 # -----------------------------
-model = joblib.load("model/logistic_model.pkl")
-scaler = joblib.load("model/scaler.pkl")
+st.title("🎓 Student Result Prediction System (Hybrid Model)")
+st.markdown(
+    """
+    This system uses a **Hybrid Machine Learning Model**:
+    - **Logistic Regression** → Pass / Fail Probability  
+    - **Linear Regression** → Expected Marks  
 
-# -----------------------------
-# Title
-# -----------------------------
-st.title("🎓 Student Result Prediction System")
-st.markdown("""
-<div class="desc">
-Pass / Fail Prediction<br>
-<b>with Smart Recommendation & Celebration</b>
-</div>
-""", unsafe_allow_html=True)
+    Final decision is based on **both probability & marks**.
+    """
+)
 
 st.divider()
 
 # -----------------------------
-# Inputs
+# User inputs
 # -----------------------------
-study_hours = st.text_input("📘 Study Hours per Day", placeholder="Enter your Hours")
-attendance = st.text_input("📊 Attendance Percentage", placeholder="Enter your Attendance (%)")
+study_hours = st.slider(
+    "📘 Study Hours (per day)",
+    min_value=0.0,
+    max_value=10.0,
+    step=0.1
+)
+
+attendance = st.slider(
+    "📊 Attendance (%)",
+    min_value=0.0,
+    max_value=100.0,
+    step=1.0
+)
 
 # -----------------------------
 # Prediction
 # -----------------------------
 if st.button("🔍 Predict Result"):
-    try:
-        study_hours = float(study_hours)
-        attendance = float(attendance)
+    input_df = pd.DataFrame(
+        [[study_hours, attendance]],
+        columns=["StudyHours", "Attendance"]
+    )
 
-        if study_hours < 0 or attendance < 0 or attendance > 100:
-            st.error("❌ Enter valid values")
-        else:
-            df = pd.DataFrame([[study_hours, attendance]],
-                              columns=["StudyHours", "Attendance"])
-            scaled = scaler.transform(df)
-            pred = model.predict(scaled)
-            prob = model.predict_proba(scaled)[0][1]
+    input_scaled = scaler.transform(input_df)
 
-            st.divider()
+    # Logistic prediction
+    pass_prob = hybrid_logistic.predict_proba(input_scaled)[0][1]
 
-            # ================= PASS =================
-            if pred[0] == 1:
-                # 🎊 CONFETTI ANIMATION USING COMPONENTS.HTML
-                components.html(f"""
-                <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
-                <script>
-                let duration = 3 * 1000;
-                let animationEnd = Date.now() + duration;
-                let defaults = {{ startVelocity: 30, spread: 360, ticks: 60, zIndex: 2000 }};
-                let interval = setInterval(function() {{
-                    let timeLeft = animationEnd - Date.now();
-                    if (timeLeft <= 0) return clearInterval(interval);
-                    let particleCount = 50 * (timeLeft / duration);
-                    confetti(Object.assign({{}}, defaults, {{
-                        particleCount: particleCount,
-                        origin: {{ x: Math.random(), y: Math.random() - 0.2 }}
-                    }}));
-                }}, 250);
-                </script>
+    # Linear prediction
+    predicted_marks = hybrid_linear.predict(input_scaled)[0]
 
-                <div style="text-align:center; font-size:24px; color:#fff; margin-top:20px;">
-                🎉🎊 STUDENT WILL PASS 🎊🎉<br>
-                📈 Pass Probability: <b>{prob*100:.2f}%</b>
-                </div>
-                """, height=400)
+    # Hybrid decision
+    if pass_prob >= 0.5 and predicted_marks >= 40:
+        final_result = "PASS"
+        st.success("🎉 **PASS**")
+    else:
+        final_result = "FAIL"
+        st.error("❌ **FAIL**")
 
-                # Recommendations
-                st.markdown("""
-                <div class="reco">
-                ✅ <b>Recommendations:</b>
-                <ul>
-                    <li>Maintain regular study routine</li>
-                    <li>Practice mock tests</li>
-                    <li>Keep attendance above 80%</li>
-                    <li>Focus on weak subjects</li>
-                </ul>
-                </div>
-                """, unsafe_allow_html=True)
+    st.divider()
 
-            # ================= FAIL =================
-            else:
-                st.markdown(f"""
-                <div class="result-card fail">
-                ❌ STUDENT WILL FAIL
-                </div>
-
-                <div class="prob-card">
-                📉 Fail Probability: <b>{(1-prob)*100:.2f}%</b>
-                </div>
-                """, unsafe_allow_html=True)
-
-                st.markdown("""
-                <div class="reco">
-                ❌ <b>Recommendations to Improve:</b>
-                <ul>
-                    <li>Increase study hours to 4–5 hrs/day</li>
-                    <li>Improve attendance above 75%</li>
-                    <li>Create daily study timetable</li>
-                    <li>Avoid distractions</li>
-                </ul>
-                </div>
-                """, unsafe_allow_html=True)
-
-    except ValueError:
-        st.error("⚠️ Please enter numeric values only")
+    st.info(f"📈 **Pass Probability:** {pass_prob*100:.2f}%")
+    st.info(f"📝 **Predicted Marks:** {predicted_marks:.2f}")
 
 # -----------------------------
 # Footer
 # -----------------------------
-st.markdown("""
-<div class="footer">
-Built with ❤️ using Streamlit
-</div>
-""", unsafe_allow_html=True)
-
-
-
+st.markdown("---")
+st.caption("Built with ❤️ using Streamlit & Hybrid Machine Learning Model")
