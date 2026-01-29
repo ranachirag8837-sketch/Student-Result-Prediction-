@@ -109,11 +109,12 @@ with col_mid:
     # Inputs inside the border
     study_hours_input = st.text_input("📘 Study Hours (per day)", value="9")
     attendance_input = st.text_input("📊 Attendance (%)", value="80")
-    predict_clicked = st.button("🌟 Predict Result")
-     """, unsafe_allow_html=True)
+    predict_clicked = st.button("🌟 Predict Result") 
+    
     
     # END OF BORDERED BOX
     st.markdown('</div>', unsafe_allow_html=True)
+     """, unsafe_allow_html=True)
 
 # =============================
 # Prediction Logic (Outside the border)
@@ -176,4 +177,5 @@ if predict_clicked:
 # Footer
 # =============================
 st.markdown("<br><center><p style='color: white; opacity: 0.8;'>Built with ❤️ | Dark Mode Active</p></center>", unsafe_allow_html=True)
+
 
