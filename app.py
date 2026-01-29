@@ -54,30 +54,98 @@ linear_model = LinearRegression()
 linear_model.fit(X_scaled, y_marks)
 
 # =============================
-# User Inputs
+# Custom TailwindCSS & Background
 # =============================
 st.markdown("""
 <style>
-/* TailwindCSS CDN */
 @import url('https://cdn.jsdelivr.net/npm/tailwindcss@3.3.2/dist/tailwind.min.css');
 
-/* Custom Streamlit overrides */
-body { background-color: #f0f2f6; }
-.stButton>button { font-weight: bold; }
+/* Page background gradient */
+body {
+    background: linear-gradient(135deg, #89f7fe, #66a6ff);
+}
+
+/* Remove Streamlit default padding for full-width cards */
+.main .block-container {
+    padding-top: 2rem;
+    max-width: 900px;
+}
+
+/* Input boxes */
+.stTextInput>div>input {
+    border-radius: 12px;
+    padding: 12px;
+    font-size: 16px;
+    border: 2px solid #ddd;
+    transition: 0.3s;
+}
+.stTextInput>div>input:focus {
+    border-color: #3B82F6;
+    box-shadow: 0 0 10px rgba(59,130,246,0.4);
+}
+
+/* Buttons */
+.stButton>button {
+    background: linear-gradient(to right, #3B82F6, #06B6D4);
+    color: white;
+    font-size: 18px;
+    font-weight: bold;
+    padding: 12px 25px;
+    border-radius: 12px;
+    transition: 0.3s;
+}
+.stButton>button:hover {
+    transform: scale(1.05);
+}
+
+/* Cards */
+.card {
+    background: white;
+    padding: 25px;
+    border-radius: 20px;
+    box-shadow: 0 15px 35px rgba(0,0,0,0.1);
+    margin-bottom: 20px;
+    transition: 0.3s;
+}
+.card:hover {
+    transform: translateY(-5px);
+}
+
+/* Result Text */
+.result-pass {
+    color: #16A34A; /* green */
+    font-weight: bold;
+    font-size: 26px;
+    text-shadow: 1px 1px 4px rgba(0,0,0,0.2);
+}
+.result-fail {
+    color: #DC2626; /* red */
+    font-weight: bold;
+    font-size: 26px;
+    text-shadow: 1px 1px 4px rgba(0,0,0,0.2);
+}
+
+/* Recommendations */
+.recommendation {
+    background: #f0f9ff;
+    border-radius: 15px;
+    padding: 18px;
+    margin-top: 10px;
+    box-shadow: inset 0 0 5px rgba(0,0,0,0.05);
+}
 </style>
 """, unsafe_allow_html=True)
 
-st.markdown("""
-<div class="flex justify-center my-8">
-  <div class="bg-white shadow-2xl rounded-2xl p-8 w-full max-w-2xl">
-    <h1 class="text-3xl font-extrabold text-center mb-6">🎓 Student Result Prediction</h1>
-    <p class="text-gray-700 text-center mb-6">
-        🔹 Hybrid ML Model: Logistic Regression → Pass/Fail, Linear Regression → Marks Prediction
-    </p>
-""", unsafe_allow_html=True)
+# =============================
+# Header
+# =============================
+st.markdown('<h1 class="text-center text-3xl font-extrabold mb-3">🎓 Student Result Prediction</h1>', unsafe_allow_html=True)
+st.markdown('<p class="text-center text-gray-700 mb-6">Hybrid ML Model: Logistic Regression → Pass/Fail, Linear Regression → Marks Prediction</p>', unsafe_allow_html=True)
 
-# Inputs in styled Tailwind cards
-col1, col2 = st.columns([1,1])
+# =============================
+# Inputs
+# =============================
+col1, col2 = st.columns(2)
 with col1:
     study_hours_input = st.text_input("📘 Study Hours (per day)", value="")
 with col2:
@@ -107,33 +175,19 @@ if st.button("🌟 Predict Result"):
         pass_prob = logistic_model.predict_proba(input_scaled)[0][1]
         pred_marks = linear_model.predict(input_scaled)[0]
 
-        # =============================
-        # Full-page Tailwind HTML
-        # =============================
-        html_code = f"""
-        <html>
-        <head>
-          <script src="https://cdn.tailwindcss.com"></script>
-          <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
-        </head>
-        <body class="bg-gray-100 flex flex-col items-center p-6">
-          <div class="max-w-2xl w-full space-y-6">
-
-            <div class="bg-white rounded-2xl shadow-2xl p-6 text-center animate-fadeIn">
-              <h2 class="text-2xl font-bold mb-4">Result</h2>
-              <p class="text-lg mb-2">Pass Probability: <span class="font-semibold">{pass_prob*100:.2f}%</span></p>
-              <p class="text-lg mb-4">Predicted Marks: <span class="font-semibold">{pred_marks:.2f} / 100</span></p>
-        """
-
+        # Result Card
         if pass_prob >= 0.5 and pred_marks >= 40:
-            html_code += """
-              <div class="text-green-600 font-bold text-2xl mb-4">🎉 RESULT: PASS</div>
-              <script>
-                function launchConfetti() {
-                  var duration = 4000;
-                  var animationEnd = Date.now() + duration;
-                  var defaults = { startVelocity: 40, spread: 360, ticks: 60, zIndex: 9999 };
-                  var interval = setInterval(function() {
+            st.markdown(f'<div class="card result-pass text-center">🎉 RESULT: PASS</div>', unsafe_allow_html=True)
+
+            # Full-page confetti
+            components.html("""
+            <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
+            <script>
+            function launchConfetti() {
+                var duration = 4000;
+                var animationEnd = Date.now() + duration;
+                var defaults = { startVelocity: 40, spread: 360, ticks: 60, zIndex: 9999 };
+                var interval = setInterval(function() {
                     var timeLeft = animationEnd - Date.now();
                     if (timeLeft <= 0) return clearInterval(interval);
                     var particleCount = 100 * (timeLeft / duration);
@@ -141,43 +195,39 @@ if st.button("🌟 Predict Result"):
                       particleCount: particleCount,
                       origin: { x: Math.random(), y: Math.random() - 0.2 }
                     }));
-                  }, 250);
-                }
-                launchConfetti();
-              </script>
-            """
+                }, 250);
+            }
+            launchConfetti();
+            </script>
+            """, height=0)
+
         else:
-            html_code += '<div class="text-red-600 font-bold text-2xl mb-4">❌ RESULT: FAIL</div>'
+            st.markdown(f'<div class="card result-fail text-center">❌ RESULT: FAIL</div>', unsafe_allow_html=True)
+
+        # Pass Probability & Marks
+        st.markdown(f'<div class="card text-center"><b>📈 Pass Probability:</b> {pass_prob*100:.2f}%<br><b>📝 Predicted Marks:</b> {pred_marks:.2f}/100</div>', unsafe_allow_html=True)
 
         # Recommendations
-        html_code += '<div class="bg-gray-50 p-4 rounded-lg shadow-inner">'
-        html_code += '<h3 class="font-bold text-lg mb-2">💡 Recommendations:</h3>'
+        rec_html = '<div class="card recommendation"><b>💡 Recommendations:</b><ul>'
         if pass_prob < 0.5 or pred_marks < 40:
-            html_code += """
-            <ul class="list-disc list-inside text-left text-gray-700">
-              <li>Increase <strong>study hours</strong> per day</li>
-              <li>Improve <strong>attendance</strong> in classes</li>
-              <li>Focus on weak subjects or topics</li>
-              <li>Practice previous exams and exercises</li>
-            </ul>
+            rec_html += """
+            <li>Increase <strong>study hours</strong> per day</li>
+            <li>Improve <strong>attendance</strong> in classes</li>
+            <li>Focus on weak subjects or topics</li>
+            <li>Practice previous exams and exercises</li>
             """
         elif pred_marks < 60:
-            html_code += """
-            <ul class="list-disc list-inside text-left text-gray-700">
-              <li>Maintain or slightly increase study hours</li>
-              <li>Keep attendance high</li>
-              <li>Focus on revision and practice to improve marks</li>
-            </ul>
+            rec_html += """
+            <li>Maintain or slightly increase study hours</li>
+            <li>Keep attendance high</li>
+            <li>Focus on revision and practice to improve marks</li>
             """
         else:
-            html_code += """
-            <ul class="list-disc list-inside text-left text-gray-700">
-              <li>Excellent performance! Keep consistent study habits 🎉</li>
-            </ul>
+            rec_html += """
+            <li>Excellent performance! Keep consistent study habits 🎉</li>
             """
-        html_code += "</div></div></body></html>"
-
-        components.html(html_code, height=700, scrolling=True)
+        rec_html += '</ul></div>'
+        st.markdown(rec_html, unsafe_allow_html=True)
 
 # =============================
 # Footer
