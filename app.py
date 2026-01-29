@@ -99,7 +99,7 @@ except:
     attendance = None
 
 # =============================
-# Prediction
+# Prediction + Recommendations
 # =============================
 if st.button("🔍 Predict Result"):
     
@@ -118,6 +118,7 @@ if st.button("🔍 Predict Result"):
 
         st.divider()
 
+        # Result display
         if pass_probability >= 0.5 and predicted_marks >= 40:
             st.success("🎉 RESULT: **PASS**")
         else:
@@ -125,6 +126,29 @@ if st.button("🔍 Predict Result"):
 
         st.info(f"📈 Pass Probability: **{pass_probability * 100:.2f}%**")
         st.info(f"📝 Predicted Marks: **{predicted_marks:.2f} / 100**")
+
+        # =============================
+        # Recommendations Logic
+        # =============================
+        st.markdown("### 💡 Recommendations:")
+        if pass_probability < 0.5 or predicted_marks < 40:
+            st.warning("""
+            - Increase **study hours** per day.  
+            - Improve **attendance** in classes.  
+            - Focus on weak subjects or topics.  
+            - Practice previous exams and exercises.
+            """)
+        elif predicted_marks < 60:
+            st.info("""
+            - Maintain or slightly increase study hours.  
+            - Keep attendance high.  
+            - Focus on revision and practice to improve marks.
+            """)
+        else:
+            st.success("""
+            - Excellent performance! 🎉  
+            - Keep up the good work and continue consistent study habits.
+            """)
 
 # =============================
 # Footer
