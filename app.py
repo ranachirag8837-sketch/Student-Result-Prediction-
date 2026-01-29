@@ -11,7 +11,6 @@ import streamlit.components.v1 as components
 # =============================
 st.set_page_config(
     page_title="🎓 Student Result Prediction",
-    page_icon="🎓",
     layout="wide"
 )
 
@@ -184,3 +183,4 @@ if st.button("🌟 Predict Result"):
 # =============================
 st.markdown("---")
 st.caption("Built with ❤️ using Streamlit • Modern TailwindCSS design")
+
