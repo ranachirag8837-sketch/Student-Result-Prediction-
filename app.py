@@ -36,7 +36,7 @@ st.markdown("""
     /* Style for Input Boxes (Semi-transparent) */
     .stTextInput > div > div > input {
         background-color: rgba(255, 255, 255, 0.1) !important;
-        color: white !important;
+        color: black !important;
         border: 1px solid #444 !important;
         text-align: center;
         border-radius: 10px;
@@ -163,3 +163,4 @@ if predict_clicked:
 # Footer
 # =============================
 st.markdown("<br><center><p style='color: #444;'>Built with ❤️ | Dark Mode Active</p></center>", unsafe_allow_html=True)
+
