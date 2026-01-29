@@ -16,7 +16,7 @@ st.set_page_config(
 )
 
 # =============================
-# Load Dataset (NO SIDEBAR)
+# Load Dataset
 # =============================
 ROOT_DIR = os.path.abspath(os.path.dirname(__file__))
 DATA_PATH = os.path.join(ROOT_DIR, "data", "student_data.csv")
@@ -124,6 +124,7 @@ if st.button("🔍 Predict Result"):
 # =============================
 st.markdown("---")
 st.caption("Built with ❤️ using Streamlit")
+
 
 
 
