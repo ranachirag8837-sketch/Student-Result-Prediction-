@@ -21,32 +21,46 @@ st.set_page_config(
 # -----------------------------
 ROOT_DIR = os.path.abspath(os.path.dirname(__file__))
 DATA_PATH = os.path.join(ROOT_DIR, "data", "student_data.csv")
-MODEL_DIR = os.path.join(ROOT_DIR, "model")
-
-LOGISTIC_PATH = os.path.join(MODEL_DIR, "hybrid_logistic.pkl")
-LINEAR_PATH = os.path.join(MODEL_DIR, "hybrid_linear.pkl")
-SCALER_PATH = os.path.join(MODEL_DIR, "hybrid_scaler.pkl")
-
-os.makedirs(MODEL_DIR, exist_ok=True)
 
 # -----------------------------
-# FORCE DELETE OLD PKL (IMPORTANT)
+# Load / Upload / Create Data
 # -----------------------------
-for file in [LOGISTIC_PATH, LINEAR_PATH, SCALER_PATH]:
-    if os.path.exists(file):
-        os.remove(file)
+st.sidebar.header("📁 Dataset")
+
+if os.path.exists(DATA_PATH):
+    df = pd.read_csv(DATA_PATH)
+    st.sidebar.success("CSV loaded from data folder")
+
+else:
+    uploaded_file = st.sidebar.file_uploader(
+        "Upload student_data.csv",
+        type=["csv"]
+    )
+
+    if uploaded_file is not None:
+        df = pd.read_csv(uploaded_file)
+        st.sidebar.success("CSV uploaded successfully")
+
+    else:
+        st.sidebar.warning("CSV not found. Using sample dataset.")
+
+        # Sample dataset (FAIL SAFE)
+        df = pd.DataFrame({
+            "StudyHours": [1, 2, 3, 4, 5, 6, 7, 8],
+            "Attendance": [40, 50, 55, 60, 70, 80, 90, 95],
+            "ResultNumeric": [0, 0, 0, 1, 1, 1, 1, 1],
+            "TotalMarks": [30, 35, 40, 45, 60, 70, 85, 90]
+        })
 
 # -----------------------------
-# Load dataset
+# Features & Targets
 # -----------------------------
-df = pd.read_csv(DATA_PATH)
-
 X = df[["StudyHours", "Attendance"]]
-y_class = df["ResultNumeric"]   # Pass / Fail
-y_score = df["TotalMarks"]      # Marks
+y_class = df["ResultNumeric"]
+y_score = df["TotalMarks"]
 
 # -----------------------------
-# Train Hybrid Model (ALWAYS FRESH)
+# Train Hybrid Model (LIVE)
 # -----------------------------
 scaler = StandardScaler()
 X_scaled = scaler.fit_transform(X)
@@ -57,11 +71,6 @@ hybrid_logistic.fit(X_scaled, y_class)
 hybrid_linear = LinearRegression()
 hybrid_linear.fit(X_scaled, y_score)
 
-# Save new models
-joblib.dump(scaler, SCALER_PATH)
-joblib.dump(hybrid_logistic, LOGISTIC_PATH)
-joblib.dump(hybrid_linear, LINEAR_PATH)
-
 # -----------------------------
 # UI
 # -----------------------------
@@ -70,10 +79,10 @@ st.title("🎓 Student Result Prediction System (Hybrid Model)")
 st.markdown("""
 This system uses a **Hybrid Machine Learning Model**:
 
-- **Logistic Regression** → Pass / Fail Probability  
-- **Linear Regression** → Predicted Marks  
+- **Logistic Regression** → Pass / Fail  
+- **Linear Regression** → Marks Prediction  
 
-The model is **trained live** to avoid deployment issues.
+The model is trained **live** to avoid deployment issues.
 """)
 
 st.divider()
@@ -81,15 +90,8 @@ st.divider()
 # -----------------------------
 # Inputs
 # -----------------------------
-study_hours = st.slider(
-    "📘 Study Hours (per day)",
-    0.0, 10.0, 4.0, 0.1
-)
-
-attendance = st.slider(
-    "📊 Attendance (%)",
-    0.0, 100.0, 75.0, 1.0
-)
+study_hours = st.slider("📘 Study Hours (per day)", 0.0, 10.0, 4.0, 0.1)
+attendance = st.slider("📊 Attendance (%)", 0.0, 100.0, 75.0, 1.0)
 
 # -----------------------------
 # Prediction
