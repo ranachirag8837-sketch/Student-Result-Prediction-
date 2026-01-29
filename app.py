@@ -76,7 +76,7 @@ st.markdown("""
 - **Logistic Regression** → Pass / Fail  
 - **Linear Regression** → Marks Prediction  
 
-📌 Clean UI • No sidebar • Internship ready
+📌 Clean UI • Internship ready
 """)
 
 st.divider()
@@ -124,5 +124,6 @@ if st.button("🔍 Predict Result"):
 # =============================
 st.markdown("---")
 st.caption("Built with ❤️ using Streamlit")
+
 
 
