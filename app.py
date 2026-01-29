@@ -95,26 +95,26 @@ linear_model = LinearRegression().fit(X_scaled, df["TotalMarks"])
 col_left, col_mid, col_right = st.columns([1, 2, 1])
 
 with col_mid:
-    # START OF BORDERED BOX (Contains everything before Result)
+    # --- START OF BORDERED BOX ---
+    # We use an opening div tag
     st.markdown('<div class="info-border-box">', unsafe_allow_html=True)
     
-    # Header inside the border
+    # Header Content
     st.markdown("""
         <h1 style="font-size: 3.5rem; font-weight: 800; color: white; margin-bottom: 0;">🎓 Student Result Prediction</h1>
         <p style="color: rgba(255,255,255,0.7); margin-bottom: 30px; font-size: 1.1rem;">
             🔹 Hybrid ML Model: Logistic Regression & Linear Regression
         </p>
-  
+    """, unsafe_allow_html=True)
 
-    # Inputs inside the border
+    # Inputs (Called as proper Python functions, NOT inside a string)
     study_hours_input = st.text_input("📘 Study Hours (per day)", value="9")
     attendance_input = st.text_input("📊 Attendance (%)", value="80")
     predict_clicked = st.button("🌟 Predict Result") 
     
-    
-    # END OF BORDERED BOX
-   </div>  """, unsafe_allow_html=True)
-    
+    # Closing the div tag
+    st.markdown('</div>', unsafe_allow_html=True)
+    # --- END OF BORDERED BOX ---
 
 # =============================
 # Prediction Logic (Outside the border)
@@ -141,8 +141,8 @@ if predict_clicked:
             <div class="bg-white/10 backdrop-blur-lg rounded-3xl p-8 text-center border border-white/20 shadow-2xl">
               <h2 class="text-3xl font-bold mb-6 text-white">Result</h2>
               <div class="space-y-2 mb-6 text-white">
-                <p class="text-xl">Pass Probability: <span class="font-bold text-blue-300">{pass_prob*100:.2f}%</span></p>
-                <p class="text-xl">Predicted Marks: <span class="font-bold text-blue-300">{pred_marks:.2f} / 100</span></p>
+                <p class="text-xl text-gray-200">Pass Probability: <span class="font-bold text-blue-300">{pass_prob*100:.2f}%</span></p>
+                <p class="text-xl text-gray-200">Predicted Marks: <span class="font-bold text-blue-300">{pred_marks:.2f} / 100</span></p>
               </div>
         """
 
@@ -159,7 +159,7 @@ if predict_clicked:
         html_code += f"""
               <div class="bg-black/40 p-5 rounded-2xl text-left border border-white/10">
                 <h3 class="font-bold text-white mb-2 italic">📍 Recommendation:</h3>
-                <p class="text-gray-200">{"Keep up the excellent work!" if pred_marks > 70 else "Focus on consistency to improve marks."}</p>
+                <p class="text-gray-300">{"Keep up the excellent work!" if pred_marks > 70 else "Focus on consistency to improve marks."}</p>
               </div>
             </div>
           </div>
@@ -177,6 +177,3 @@ if predict_clicked:
 # Footer
 # =============================
 st.markdown("<br><center><p style='color: white; opacity: 0.8;'>Built with ❤️ | Dark Mode Active</p></center>", unsafe_allow_html=True)
-
-
-
