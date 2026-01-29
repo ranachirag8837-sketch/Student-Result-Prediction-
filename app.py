@@ -116,13 +116,15 @@ if st.button("🔍 Predict Result"):
             components.html("""
             <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
             <script>
+              setTimeout(() => {
                 confetti({
-                    particleCount: 200,
-                    spread: 70,
+                    particleCount: 300,
+                    spread: 100,
                     origin: { y: 0.6 }
                 });
+              }, 100);
             </script>
-            """, height=200)
+            """, height=400)
         else:
             st.error("❌ RESULT: **FAIL**")
 
