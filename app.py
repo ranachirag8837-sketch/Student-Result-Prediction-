@@ -162,6 +162,7 @@ if predict_clicked:
 # =============================
 # Footer
 # =============================
-st.markdown("<br><center><p style='color: #444;'>Built with ❤️ | Dark Mode Active</p></center>", unsafe_allow_html=True)
+st.markdown("<br><center><p style='color: #fff;'>Built with ❤️ | Dark Mode Active</p></center>", unsafe_allow_html=True)
+
 
 
