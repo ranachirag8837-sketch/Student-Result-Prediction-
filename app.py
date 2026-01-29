@@ -104,7 +104,7 @@ with col_mid:
         <p style="color: rgba(255,255,255,0.7); margin-bottom: 30px; font-size: 1.1rem;">
             🔹 Hybrid ML Model: Logistic Regression & Linear Regression
         </p>
-   
+  
 
     # Inputs inside the border
     study_hours_input = st.text_input("📘 Study Hours (per day)", value="9")
@@ -113,8 +113,8 @@ with col_mid:
     
     
     # END OF BORDERED BOX
-    st.markdown('</div>', unsafe_allow_html=True)
-     """, unsafe_allow_html=True)
+   </div>  """, unsafe_allow_html=True)
+    
 
 # =============================
 # Prediction Logic (Outside the border)
@@ -177,5 +177,6 @@ if predict_clicked:
 # Footer
 # =============================
 st.markdown("<br><center><p style='color: white; opacity: 0.8;'>Built with ❤️ | Dark Mode Active</p></center>", unsafe_allow_html=True)
+
 
 
