@@ -69,7 +69,7 @@ linear_model.fit(X_scaled, y_marks)
 # =============================
 # UI – Main Page
 # =============================
-st.title("🎓 Student Result Prediction System (Hybrid Model)")
+st.title("🎓 Student Result Prediction System")
 
 st.markdown("""
 ### 🔹 Hybrid Machine Learning Model
@@ -124,4 +124,5 @@ if st.button("🔍 Predict Result"):
 # =============================
 st.markdown("---")
 st.caption("Built with ❤️ using Streamlit")
+
 
