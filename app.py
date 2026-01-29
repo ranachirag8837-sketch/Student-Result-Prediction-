@@ -123,8 +123,7 @@ div.stButton > button {{
 # -----------------------------
 model = joblib.load("model/logistic_model.pkl")
 scaler = joblib.load("model/scaler.pkl")
-model = joblib.load("model/hybrid_logistic.pkl")
-scaler = joblib.load("model/hybrid_scaler.pkl")
+
 
 # -----------------------------
 # Title
@@ -238,4 +237,5 @@ st.markdown("""
 Built with ❤️ using Streamlit
 </div>
 """, unsafe_allow_html=True)
+
 
