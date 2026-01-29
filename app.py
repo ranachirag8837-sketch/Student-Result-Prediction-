@@ -24,7 +24,7 @@ DATA_PATH = os.path.join(ROOT_DIR, "data", "student_data.csv")
 if os.path.exists(DATA_PATH):
     df = pd.read_csv(DATA_PATH)
 else:
-    # Silent fallback (no warning shown)
+    # Silent fallback dataset
     df = pd.DataFrame({
         "StudyHours": [1,2,3,4,5,6,7,8],
         "Attendance": [45,50,55,60,70,80,90,95],
@@ -82,16 +82,22 @@ st.markdown("""
 st.divider()
 
 # =============================
-# User Inputs
+# User Inputs – Textboxes
 # =============================
-study_hours = st.slider(
+study_hours = st.number_input(
     "📘 Study Hours (per day)",
-    0.0, 10.0, 4.0, 0.1
+    min_value=0.0,
+    max_value=24.0,
+    value=4.0,
+    step=0.1
 )
 
-attendance = st.slider(
+attendance = st.number_input(
     "📊 Attendance (%)",
-    0.0, 100.0, 75.0, 1.0
+    min_value=0.0,
+    max_value=100.0,
+    value=75.0,
+    step=1.0
 )
 
 # =============================
@@ -124,7 +130,3 @@ if st.button("🔍 Predict Result"):
 # =============================
 st.markdown("---")
 st.caption("Built with ❤️ using Streamlit")
-
-
-
-
