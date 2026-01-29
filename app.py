@@ -10,7 +10,7 @@ from sklearn.linear_model import LogisticRegression, LinearRegression
 # Page Configuration
 # =============================
 st.set_page_config(
-    page_title="Student Result Prediction (Hybrid)",
+    page_title="Student Result Prediction",
     page_icon="🎓",
     layout="centered"
 )
@@ -123,4 +123,5 @@ if st.button("🔍 Predict Result"):
 # Footer
 # =============================
 st.markdown("---")
-st.caption("Built with ❤️ using Streamlit & Hybrid Machine Learning Model")
+st.caption("Built with ❤️ using Streamlit")
+
