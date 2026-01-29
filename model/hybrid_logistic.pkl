@@ -1,0 +1,28 @@
+import pandas as pd
+import joblib
+import os
+from sklearn.linear_model import LogisticRegression
+from sklearn.model_selection import train_test_split
+
+ROOT_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
+CSV_PATH = os.path.join(ROOT_DIR, "data", "student_data.csv")
+MODEL_DIR = os.path.join(ROOT_DIR, "model")
+
+df = pd.read_csv(CSV_PATH)
+
+X = df[["StudyHours", "Attendance"]]
+y = df["ResultNumeric"]
+
+scaler = joblib.load(os.path.join(MODEL_DIR, "hybrid_scaler.pkl"))
+X_scaled = scaler.transform(X)
+
+X_train, X_test, y_train, y_test = train_test_split(
+    X_scaled, y, test_size=0.2, random_state=42
+)
+
+model = LogisticRegression()
+model.fit(X_train, y_train)
+
+joblib.dump(model, os.path.join(MODEL_DIR, "hybrid_logistic.pkl"))
+
+print("✅ hybrid_logistic.pkl created")
