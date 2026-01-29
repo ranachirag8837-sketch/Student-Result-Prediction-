@@ -7,7 +7,7 @@ from sklearn.linear_model import LogisticRegression, LinearRegression
 import streamlit.components.v1 as components
 
 # =============================
-# Page Config
+# Page Configuration
 # =============================
 st.set_page_config(
     page_title="🎓 Student Result Prediction",
@@ -54,94 +54,30 @@ linear_model = LinearRegression()
 linear_model.fit(X_scaled, y_marks)
 
 # =============================
-# Custom CSS
+# User Inputs
 # =============================
 st.markdown("""
 <style>
-/* General Page */
-body {
-    background: linear-gradient(135deg, #f5f7fa, #c3cfe2);
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-}
+/* TailwindCSS CDN */
+@import url('https://cdn.jsdelivr.net/npm/tailwindcss@3.3.2/dist/tailwind.min.css');
 
-/* Center all content */
-.main .block-container {
-    padding-top: 2rem;
-    max-width: 900px;
-}
-
-/* Input Boxes */
-.stTextInput>div>input {
-    border-radius: 12px;
-    padding: 12px;
-    font-size: 16px;
-    border: 2px solid #ddd;
-    transition: 0.3s;
-}
-.stTextInput>div>input:focus {
-    border-color: #4CAF50;
-    box-shadow: 0 0 10px rgba(76, 175, 80, 0.4);
-}
-
-/* Button */
-.stButton>button {
-    background: linear-gradient(to right, #4CAF50, #81C784);
-    color: white;
-    font-size: 18px;
-    font-weight: bold;
-    padding: 12px 25px;
-    border-radius: 12px;
-    transition: 0.3s;
-}
-.stButton>button:hover {
-    transform: scale(1.05);
-}
-
-/* Cards */
-.card {
-    background: white;
-    padding: 20px;
-    border-radius: 20px;
-    box-shadow: 0 15px 30px rgba(0,0,0,0.1);
-    margin-bottom: 20px;
-    transition: 0.3s;
-}
-.card:hover {
-    transform: translateY(-5px);
-}
-
-/* Result Text */
-.result-pass {
-    color: #2E7D32;
-    font-weight: bold;
-    font-size: 24px;
-}
-.result-fail {
-    color: #C62828;
-    font-weight: bold;
-    font-size: 24px;
-}
-
-/* Recommendations */
-.recommendation {
-    background: #f0f0f0;
-    border-radius: 15px;
-    padding: 15px;
-    margin-top: 10px;
-}
+/* Custom Streamlit overrides */
+body { background-color: #f0f2f6; }
+.stButton>button { font-weight: bold; }
 </style>
 """, unsafe_allow_html=True)
 
-# =============================
-# Header
-# =============================
-st.markdown('<h1 style="text-align:center; font-size:32px; margin-bottom:15px;">🎓 Student Result Prediction System</h1>', unsafe_allow_html=True)
-st.markdown('<p style="text-align:center; font-size:16px; color:#555;">Hybrid ML Model: Logistic Regression → Pass/Fail, Linear Regression → Marks Prediction</p>', unsafe_allow_html=True)
+st.markdown("""
+<div class="flex justify-center my-8">
+  <div class="bg-white shadow-2xl rounded-2xl p-8 w-full max-w-2xl">
+    <h1 class="text-3xl font-extrabold text-center mb-6">🎓 Student Result Prediction</h1>
+    <p class="text-gray-700 text-center mb-6">
+        🔹 Hybrid ML Model: Logistic Regression → Pass/Fail, Linear Regression → Marks Prediction
+    </p>
+""", unsafe_allow_html=True)
 
-# =============================
-# Inputs
-# =============================
-col1, col2 = st.columns(2)
+# Inputs in styled Tailwind cards
+col1, col2 = st.columns([1,1])
 with col1:
     study_hours_input = st.text_input("📘 Study Hours (per day)", value="")
 with col2:
@@ -158,7 +94,7 @@ except:
     attendance = None
 
 # =============================
-# Prediction Button
+# Prediction
 # =============================
 if st.button("🌟 Predict Result"):
 
@@ -172,67 +108,79 @@ if st.button("🌟 Predict Result"):
         pred_marks = linear_model.predict(input_scaled)[0]
 
         # =============================
-        # Result Card
+        # Full-page Tailwind HTML
         # =============================
-        if pass_prob >= 0.5 and pred_marks >= 40:
-            st.markdown(f'<div class="card result-pass">🎉 RESULT: PASS</div>', unsafe_allow_html=True)
+        html_code = f"""
+        <html>
+        <head>
+          <script src="https://cdn.tailwindcss.com"></script>
+          <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
+        </head>
+        <body class="bg-gray-100 flex flex-col items-center p-6">
+          <div class="max-w-2xl w-full space-y-6">
 
-            # Full-page confetti
-            components.html("""
-            <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
-            <script>
-            function launchConfetti() {
-                var duration = 4000;
-                var animationEnd = Date.now() + duration;
-                var defaults = { startVelocity: 40, spread: 360, ticks: 60, zIndex: 9999 };
-                var interval = setInterval(function() {
+            <div class="bg-white rounded-2xl shadow-2xl p-6 text-center animate-fadeIn">
+              <h2 class="text-2xl font-bold mb-4">Result</h2>
+              <p class="text-lg mb-2">Pass Probability: <span class="font-semibold">{pass_prob*100:.2f}%</span></p>
+              <p class="text-lg mb-4">Predicted Marks: <span class="font-semibold">{pred_marks:.2f} / 100</span></p>
+        """
+
+        if pass_prob >= 0.5 and pred_marks >= 40:
+            html_code += """
+              <div class="text-green-600 font-bold text-2xl mb-4">🎉 RESULT: PASS</div>
+              <script>
+                function launchConfetti() {
+                  var duration = 4000;
+                  var animationEnd = Date.now() + duration;
+                  var defaults = { startVelocity: 40, spread: 360, ticks: 60, zIndex: 9999 };
+                  var interval = setInterval(function() {
                     var timeLeft = animationEnd - Date.now();
                     if (timeLeft <= 0) return clearInterval(interval);
                     var particleCount = 100 * (timeLeft / duration);
                     confetti(Object.assign({}, defaults, {
-                        particleCount: particleCount,
-                        origin: { x: Math.random(), y: Math.random() - 0.2 }
+                      particleCount: particleCount,
+                      origin: { x: Math.random(), y: Math.random() - 0.2 }
                     }));
-                }, 250);
-            }
-            launchConfetti();
-            </script>
-            """, height=0)
-
+                  }, 250);
+                }
+                launchConfetti();
+              </script>
+            """
         else:
-            st.markdown(f'<div class="card result-fail">❌ RESULT: FAIL</div>', unsafe_allow_html=True)
+            html_code += '<div class="text-red-600 font-bold text-2xl mb-4">❌ RESULT: FAIL</div>'
 
-        # =============================
-        # Pass Probability & Marks
-        # =============================
-        st.markdown(f'<div class="card"><b>📈 Pass Probability:</b> {pass_prob*100:.2f}%<br><b>📝 Predicted Marks:</b> {pred_marks:.2f}/100</div>', unsafe_allow_html=True)
-
-        # =============================
         # Recommendations
-        # =============================
-        rec_html = '<div class="card recommendation"><b>💡 Recommendations:</b><ul>'
+        html_code += '<div class="bg-gray-50 p-4 rounded-lg shadow-inner">'
+        html_code += '<h3 class="font-bold text-lg mb-2">💡 Recommendations:</h3>'
         if pass_prob < 0.5 or pred_marks < 40:
-            rec_html += """
-            <li>Increase <strong>study hours</strong> per day</li>
-            <li>Improve <strong>attendance</strong> in classes</li>
-            <li>Focus on weak subjects or topics</li>
-            <li>Practice previous exams and exercises</li>
+            html_code += """
+            <ul class="list-disc list-inside text-left text-gray-700">
+              <li>Increase <strong>study hours</strong> per day</li>
+              <li>Improve <strong>attendance</strong> in classes</li>
+              <li>Focus on weak subjects or topics</li>
+              <li>Practice previous exams and exercises</li>
+            </ul>
             """
         elif pred_marks < 60:
-            rec_html += """
-            <li>Maintain or slightly increase study hours</li>
-            <li>Keep attendance high</li>
-            <li>Focus on revision and practice to improve marks</li>
+            html_code += """
+            <ul class="list-disc list-inside text-left text-gray-700">
+              <li>Maintain or slightly increase study hours</li>
+              <li>Keep attendance high</li>
+              <li>Focus on revision and practice to improve marks</li>
+            </ul>
             """
         else:
-            rec_html += """
-            <li>Excellent performance! Keep consistent study habits 🎉</li>
+            html_code += """
+            <ul class="list-disc list-inside text-left text-gray-700">
+              <li>Excellent performance! Keep consistent study habits 🎉</li>
+            </ul>
             """
-        rec_html += '</ul></div>'
-        st.markdown(rec_html, unsafe_allow_html=True)
+        html_code += "</div></div></body></html>"
+
+        components.html(html_code, height=700, scrolling=True)
 
 # =============================
 # Footer
 # =============================
 st.markdown("---")
-st.caption("Built with ❤️ using Streamlit • Modern CSS Design")
+st.caption("Built with ❤️ using Streamlit • Modern TailwindCSS design")
