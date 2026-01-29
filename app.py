@@ -10,9 +10,9 @@ import streamlit.components.v1 as components  # Needed for JS confetti
 # Page Configuration
 # =============================
 st.set_page_config(
-    page_title="Student Result Prediction",
+    page_title="🎓 Student Result Prediction",
     page_icon="🎓",
-    layout="centered"
+    layout="wide"
 )
 
 # =============================
@@ -24,7 +24,7 @@ DATA_PATH = os.path.join(ROOT_DIR, "data", "student_data.csv")
 if os.path.exists(DATA_PATH):
     df = pd.read_csv(DATA_PATH)
 else:
-    # Silent fallback dataset
+    # fallback dataset
     df = pd.DataFrame({
         "StudyHours": [1,2,3,4,5,6,7,8],
         "Attendance": [45,50,55,60,70,80,90,95],
@@ -61,6 +61,21 @@ linear_model = LinearRegression()
 linear_model.fit(X_scaled, y_marks)
 
 # =============================
+# Custom CSS for Modern UI
+# =============================
+st.markdown("""
+<style>
+/* Center the content */
+[data-testid="stSidebar"] { display: none; }
+body { background: #f0f2f6; }
+.stButton>button { background-color: #4CAF50; color: white; font-size: 18px; border-radius: 10px; padding: 10px 20px; }
+.stTextInput>div>input { border-radius: 10px; padding: 10px; font-size: 16px; }
+.stInfo, .stSuccess, .stWarning, .stError { border-radius: 10px; padding: 10px; }
+h1, h2, h3, h4 { font-family: 'Arial Black', sans-serif; }
+</style>
+""", unsafe_allow_html=True)
+
+# =============================
 # UI – Main Page
 # =============================
 st.title("🎓 Student Result Prediction System")
@@ -69,15 +84,19 @@ st.markdown("""
 - **Logistic Regression** → Pass / Fail  
 - **Linear Regression** → Marks Prediction  
 
-📌 Clean UI • Internship ready
+📌 Modern, responsive design • 3D Confetti animation on PASS
 """)
 st.divider()
 
 # =============================
-# User Inputs – Textboxes (allow empty)
+# Input Section (Styled Cards)
 # =============================
-study_hours_input = st.text_input("📘 Study Hours (per day)", value="")
-attendance_input = st.text_input("📊 Attendance (%)", value="")
+col1, col2 = st.columns([1,1])
+
+with col1:
+    study_hours_input = st.text_input("📘 Study Hours (per day)", value="")
+with col2:
+    attendance_input = st.text_input("📊 Attendance (%)", value="")
 
 # Convert inputs to float, handle empty input
 try:
@@ -91,7 +110,7 @@ except:
     attendance = None
 
 # =============================
-# Prediction + Recommendations + Confetti
+# Prediction + Recommendations + Full-page Confetti
 # =============================
 if st.button("🔍 Predict Result"):
     
@@ -107,27 +126,43 @@ if st.button("🔍 Predict Result"):
         st.divider()
 
         # =============================
-        # Result display + Confetti
+        # Result display
         # =============================
         if pass_probability >= 0.5 and predicted_marks >= 40:
             st.success("🎉 RESULT: **PASS**")
-            
-            # 🎉 Confetti animation
+
+            # Full-page 3D confetti animation (continuous bursts)
             components.html("""
             <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
             <script>
-              setTimeout(() => {
-                confetti({
-                    particleCount: 300,
-                    spread: 100,
-                    origin: { y: 0.6 }
-                });
-              }, 100);
+            function launchConfetti() {
+                var duration = 3000;
+                var animationEnd = Date.now() + duration;
+                var defaults = { startVelocity: 30, spread: 360, ticks: 60, zIndex: 9999 };
+                function randomInRange(min, max) {
+                    return Math.random() * (max - min) + min;
+                }
+                var interval = setInterval(function() {
+                    var timeLeft = animationEnd - Date.now();
+                    if (timeLeft <= 0) {
+                        return clearInterval(interval);
+                    }
+                    var particleCount = 50 * (timeLeft / duration);
+                    confetti(Object.assign({}, defaults, {
+                        particleCount: particleCount,
+                        origin: { x: Math.random(), y: Math.random() - 0.2 }
+                    }));
+                }, 250);
+            }
+            launchConfetti();
             </script>
-            """, height=400)
+            """, height=600)
         else:
             st.error("❌ RESULT: **FAIL**")
 
+        # =============================
+        # Probability and Marks
+        # =============================
         st.info(f"📈 Pass Probability: **{pass_probability * 100:.2f}%**")
         st.info(f"📝 Predicted Marks: **{predicted_marks:.2f} / 100**")
 
