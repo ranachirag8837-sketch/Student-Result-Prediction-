@@ -30,35 +30,37 @@ SCALER_PATH = os.path.join(MODEL_DIR, "hybrid_scaler.pkl")
 os.makedirs(MODEL_DIR, exist_ok=True)
 
 # -----------------------------
-# Auto train model if not exists
+# FORCE DELETE OLD PKL (IMPORTANT)
 # -----------------------------
-if not (os.path.exists(LOGISTIC_PATH) and os.path.exists(LINEAR_PATH) and os.path.exists(SCALER_PATH)):
-
-    df = pd.read_csv(DATA_PATH)
-
-    X = df[["StudyHours", "Attendance"]]
-    y_class = df["ResultNumeric"]   # 0 = Fail, 1 = Pass
-    y_score = df["TotalMarks"]      # Marks
-
-    scaler = StandardScaler()
-    X_scaled = scaler.fit_transform(X)
-
-    hybrid_logistic = LogisticRegression()
-    hybrid_logistic.fit(X_scaled, y_class)
-
-    hybrid_linear = LinearRegression()
-    hybrid_linear.fit(X_scaled, y_score)
-
-    joblib.dump(scaler, SCALER_PATH)
-    joblib.dump(hybrid_logistic, LOGISTIC_PATH)
-    joblib.dump(hybrid_linear, LINEAR_PATH)
+for file in [LOGISTIC_PATH, LINEAR_PATH, SCALER_PATH]:
+    if os.path.exists(file):
+        os.remove(file)
 
 # -----------------------------
-# Load models
+# Load dataset
 # -----------------------------
-scaler = joblib.load(SCALER_PATH)
-hybrid_logistic = joblib.load(LOGISTIC_PATH)
-hybrid_linear = joblib.load(LINEAR_PATH)
+df = pd.read_csv(DATA_PATH)
+
+X = df[["StudyHours", "Attendance"]]
+y_class = df["ResultNumeric"]   # Pass / Fail
+y_score = df["TotalMarks"]      # Marks
+
+# -----------------------------
+# Train Hybrid Model (ALWAYS FRESH)
+# -----------------------------
+scaler = StandardScaler()
+X_scaled = scaler.fit_transform(X)
+
+hybrid_logistic = LogisticRegression()
+hybrid_logistic.fit(X_scaled, y_class)
+
+hybrid_linear = LinearRegression()
+hybrid_linear.fit(X_scaled, y_score)
+
+# Save new models
+joblib.dump(scaler, SCALER_PATH)
+joblib.dump(hybrid_logistic, LOGISTIC_PATH)
+joblib.dump(hybrid_linear, LINEAR_PATH)
 
 # -----------------------------
 # UI
@@ -71,7 +73,7 @@ This system uses a **Hybrid Machine Learning Model**:
 - **Logistic Regression** → Pass / Fail Probability  
 - **Linear Regression** → Predicted Marks  
 
-Final result is based on **both models together**.
+The model is **trained live** to avoid deployment issues.
 """)
 
 st.divider()
@@ -94,12 +96,12 @@ attendance = st.slider(
 # -----------------------------
 if st.button("🔍 Predict Result"):
 
-    input_data = pd.DataFrame(
+    input_df = pd.DataFrame(
         [[study_hours, attendance]],
         columns=["StudyHours", "Attendance"]
     )
 
-    input_scaled = scaler.transform(input_data)
+    input_scaled = scaler.transform(input_df)
 
     pass_prob = hybrid_logistic.predict_proba(input_scaled)[0][1]
     predicted_marks = hybrid_linear.predict(input_scaled)[0]
