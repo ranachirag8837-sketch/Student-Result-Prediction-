@@ -21,7 +21,8 @@ st.set_page_config(
 st.sidebar.header("📁 Dataset")
 
 ROOT_DIR = os.path.abspath(os.path.dirname(__file__))
-DATA_PATH = os.path.join(ROOT_DIR, "data", "student_data.csv")
+DATA_PATH = os.path.join(ROOT_DIR, "data", "student_data.csv
+")
 
 if os.path.exists(DATA_PATH):
     df = pd.read_csv(DATA_PATH)
@@ -138,3 +139,4 @@ if st.button("🔍 Predict Result"):
 # -----------------------------
 st.markdown("---")
 st.caption("Built with ❤️ using Streamlit & Hybrid Machine Learning Model")
+
