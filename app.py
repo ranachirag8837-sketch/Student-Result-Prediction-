@@ -2,9 +2,9 @@ import streamlit as st
 import os
 import pandas as pd
 import numpy as np
-
 from sklearn.preprocessing import StandardScaler
 from sklearn.linear_model import LogisticRegression, LinearRegression
+import streamlit.components.v1 as components  # Needed for JS confetti
 
 # =============================
 # Page Configuration
@@ -35,13 +35,7 @@ else:
 # =============================
 # Required Columns Check
 # =============================
-required_columns = [
-    "StudyHours",
-    "Attendance",
-    "ResultNumeric",
-    "TotalMarks"
-]
-
+required_columns = ["StudyHours", "Attendance", "ResultNumeric", "TotalMarks"]
 for col in required_columns:
     if col not in df.columns:
         st.error(f"❌ Missing required column: {col}")
@@ -70,7 +64,6 @@ linear_model.fit(X_scaled, y_marks)
 # UI – Main Page
 # =============================
 st.title("🎓 Student Result Prediction System")
-
 st.markdown("""
 ### 🔹 Hybrid Machine Learning Model
 - **Logistic Regression** → Pass / Fail  
@@ -78,7 +71,6 @@ st.markdown("""
 
 📌 Clean UI • Internship ready
 """)
-
 st.divider()
 
 # =============================
@@ -99,18 +91,14 @@ except:
     attendance = None
 
 # =============================
-# Prediction + Recommendations
+# Prediction + Recommendations + Confetti
 # =============================
 if st.button("🔍 Predict Result"):
     
     if study_hours is None or attendance is None:
         st.warning("⚠️ Please enter both Study Hours and Attendance before predicting.")
     else:
-        input_data = pd.DataFrame(
-            [[study_hours, attendance]],
-            columns=["StudyHours", "Attendance"]
-        )
-
+        input_data = pd.DataFrame([[study_hours, attendance]], columns=["StudyHours", "Attendance"])
         input_scaled = scaler.transform(input_data)
 
         pass_probability = logistic_model.predict_proba(input_scaled)[0][1]
@@ -118,9 +106,23 @@ if st.button("🔍 Predict Result"):
 
         st.divider()
 
-        # Result display
+        # =============================
+        # Result display + Confetti
+        # =============================
         if pass_probability >= 0.5 and predicted_marks >= 40:
             st.success("🎉 RESULT: **PASS**")
+            
+            # 🎉 Confetti animation
+            components.html("""
+            <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
+            <script>
+                confetti({
+                    particleCount: 200,
+                    spread: 70,
+                    origin: { y: 0.6 }
+                });
+            </script>
+            """, height=200)
         else:
             st.error("❌ RESULT: **FAIL**")
 
