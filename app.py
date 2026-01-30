@@ -160,26 +160,38 @@ if predict_clicked:
         with col_mid:
             components.html(html_code, height=350)
 
-            # --- ML GRAPH SECTION ---
+            # --- ML BAR CHART SECTION ---
             st.write("---")
-            st.markdown("<h3 style='text-align: center;'>📊 Machine Learning Visual Analysis</h3>", unsafe_allow_html=True)
+            st.markdown("<h3 style='text-align: center;'>📊 Study Hours vs Attendance Analysis</h3>", unsafe_allow_html=True)
             
             
+
             fig, ax = plt.subplots(figsize=(10, 5))
             fig.patch.set_facecolor('#4B0082') 
-            ax.set_facecolor('#fff')
+            ax.set_facecolor('#ffffff10')
 
-            # Scatter historical data
-            ax.bar(df['StudyHours'], df['Attendance'], c=df['ResultNumeric'], cmap='RdYlGn', s=100, label='Historical Data', alpha=0.5)
+            # Bar chart colors based on Pass/Fail status
+            colors = ['#4ade80' if r == 1 else '#f87171' for r in df['ResultNumeric']]
             
-            # Plot the User's current input as a large star
-            ax.bar(sh, at, color='cyan', marker='*', s=400, label='Your Prediction', edgecolors='white', linewidth=2)
+            # Plot historical data as Bars
+            ax.bar(df['StudyHours'], df['Attendance'], color=colors, alpha=0.6, label='Historical Data', width=0.6)
+            
+            # Plot the User's current input as a special bar
+            ax.bar(sh, at, color='cyan', label='Your Input', width=0.4, edgecolor='white', linewidth=2)
 
             ax.set_xlabel('Study Hours', color='white', fontsize=12)
             ax.set_ylabel('Attendance (%)', color='white', fontsize=12)
             ax.tick_params(colors='white')
-            ax.legend(facecolor='#4B0082', labelcolor='white')
-            ax.grid(True, linestyle='--', alpha=0.2)
+            
+            # Custom Legend
+            from matplotlib.lines import Line2D
+            custom_lines = [Line2D([0], [0], color='#4ade80', lw=4, alpha=0.6),
+                            Line2D([0], [0], color='#f87171', lw=4, alpha=0.6),
+                            Line2D([0], [0], color='cyan', lw=4)]
+            ax.legend(custom_lines, ['Pass Path', 'Fail Path', 'Your Input'], 
+                      facecolor='#4B0082', labelcolor='white')
+            
+            ax.grid(axis='y', linestyle='--', alpha=0.2)
             
             st.pyplot(fig)
             
@@ -187,7 +199,4 @@ if predict_clicked:
         st.error("⚠️ Please enter valid numeric values for Study Hours and Attendance.")
 
 # Footer
-st.markdown("<br><center><p style='color: white; opacity: 0.5;'>Predictor v2.1 | Data Visualization Enabled</p></center>", unsafe_allow_html=True)
-
-
-
+st.markdown("<br><center><p style='color: white; opacity: 0.5;'>Predictor v2.2 | Bar Analytics Enabled</p></center>", unsafe_allow_html=True)
