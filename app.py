@@ -7,7 +7,7 @@ from sklearn.linear_model import LogisticRegression, LinearRegression
 import streamlit.components.v1 as components
 
 # =============================
-# 1. Page Configuration
+# Page Configuration
 # =============================
 st.set_page_config(
     page_title="🎓 Student Result Prediction AI",
@@ -15,7 +15,7 @@ st.set_page_config(
 )
 
 # =============================
-# 2. Custom CSS (Purple Theme & No Borders)
+# Custom CSS (Borders Removed)
 # =============================
 st.markdown("""
 <style>
@@ -25,46 +25,55 @@ st.markdown("""
         color: white;
     }
 
-    /* Main Container (Border Removed) */
-    .main-box {
+    /* Info Container (No Border) */
+    .info-border-box {
         border: none !important; 
-        border-radius: 30px;
-        padding: 50px;
-        background-color: rgba(255, 255, 255, 0.08); 
-        margin-bottom: 25px;
+        border-radius: 25px;
+        padding: 40px;
+        background-color: rgba(255, 255, 255, 0.07);
+        margin-top: 20px;
+        margin-bottom: 20px;
         text-align: center;
     }
 
     /* Input Box Styling */
     .stTextInput > div > div > input {
-        background-color: rgba(255, 255, 255, 0.95) !important;
-        color: #000 !important;
+        background-color: rgba(255, 255, 255, 0.9) !important;
+        color: black !important;
         border: none !important; 
-        border-radius: 12px;
         text-align: center;
-        height: 50px;
+        border-radius: 12px;
+        height: 45px;
+    }
+
+    /* Centering labels */
+    .stTextInput > label {
+        display: flex;
+        justify-content: center;
+        color: #ffffff !important;
+        font-weight: bold;
+        margin-bottom: 10px;
     }
 
     /* Predict Button */
+    div.stButton {
+        text-align: center;
+        margin-top: 25px;
+    }
+
     .stButton > button {
         background-color: #3b82f6 !important;
         color: white !important;
-        border-radius: 15px;
-        padding: 0.8rem 3.5rem;
+        border-radius: 12px;
+        padding: 0.6rem 2.5rem;
         border: none !important;
-        font-weight: 800;
-        transition: 0.3s;
-    }
-
-    .stButton > button:hover {
-        background-color: #2563eb !important;
-        transform: scale(1.05);
+        font-weight: bold;
     }
 </style>
 """, unsafe_allow_html=True)
 
 # =============================
-# 3. AI/ML Dataset & Model Training
+# Load Dataset & Training
 # =============================
 df = pd.DataFrame({
     "StudyHours": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
@@ -77,92 +86,102 @@ X = df[["StudyHours", "Attendance"]]
 scaler = StandardScaler()
 X_scaled = scaler.fit_transform(X)
 
-# AI Models
 logistic_model = LogisticRegression().fit(X_scaled, df["ResultNumeric"])
 linear_model = LinearRegression().fit(X_scaled, df["TotalMarks"])
 
 # =============================
-# 4. User Interface Layout
+# Main Layout
 # =============================
-col_l, col_m, col_r = st.columns([1, 2, 1])
+col_left, col_mid, col_right = st.columns([1, 2, 1])
 
-with col_m:
-    st.markdown('<div class="main-box">', unsafe_allow_html=True)
+with col_mid:
+    st.markdown('<div class="info-border-box">', unsafe_allow_html=True)
+    
     st.markdown("""
-        <h1 style="font-size: 3rem; margin-bottom: 10px;">🎓 Student Prediction AI</h1>
-        <p style="opacity: 0.8; font-size: 1.2rem; margin-bottom: 40px;">
-            AI-Driven Academic Performance Analysis
+        <h1 style="font-size: 3.5rem; font-weight: 800; color: white; margin-bottom: 0;">🎓 Student Result Prediction</h1>
+        <p style="color: rgba(255,255,255,0.7); margin-bottom: 30px; font-size: 1.1rem;">
+            🔹 Hybrid ML Model: Logistic & Linear Regression
         </p>
     """, unsafe_allow_html=True)
 
-    sh_input = st.text_input("📘 Study Hours (per day)", value="8")
-    at_input = st.text_input("📊 Attendance (%)", value="85")
+    study_hours_input = st.text_input("📘 Study Hours (per day)", value="8")
+    attendance_input = st.text_input("📊 Attendance (%)", value="85")
+    predict_clicked = st.button("🌟 Predict Result") 
     
-    st.markdown("<br>", unsafe_allow_html=True)
-    predict_clicked = st.button("🌟 PREDICT NOW")
     st.markdown('</div>', unsafe_allow_html=True)
 
 # =============================
-# 5. Prediction Logic & Visualization
+# Prediction Logic
 # =============================
 if predict_clicked:
     try:
-        sh = float(sh_input)
-        at = float(at_input)
+        sh = float(study_hours_input)
+        at = float(attendance_input)
         
-        # Scaling Input for AI
-        user_data = pd.DataFrame([[sh, at]], columns=["StudyHours", "Attendance"])
-        user_scaled = scaler.transform(user_data)
+        # Prepare Input
+        input_data = pd.DataFrame([[sh, at]], columns=["StudyHours", "Attendance"])
+        input_scaled = scaler.transform(input_data)
 
-        # Inference
-        pass_prob = logistic_model.predict_proba(user_scaled)[0][1]
-        pred_marks = min(float(linear_model.predict(user_scaled)[0]), 100.0)
+        # Predict
+        pass_prob = logistic_model.predict_proba(input_scaled)[0][1]
+        pred_marks = min(float(linear_model.predict(input_scaled)[0]), 100.0)
 
-        # Result Display (No Border)
+        # Result Card HTML
         res_text = "PASS" if pass_prob >= 0.5 else "FAIL"
         res_color = "#4ade80" if pass_prob >= 0.5 else "#f87171"
 
-        st.markdown(f"""
-            <div style="background: rgba(0,0,0,0.3); padding: 30px; border-radius: 25px; text-align: center; margin-top: 20px;">
-                <h2 style="color: {res_color}; font-size: 50px; font-weight: 900;">{res_text}</h2>
-                <p style="font-size: 1.3rem;">Pass Probability: <b>{pass_prob*100:.1f}%</b></p>
-                <p style="font-size: 1.3rem;">Estimated Marks: <b>{pred_marks:.1f} / 100</b></p>
+        html_code = f"""
+        <html>
+        <head>
+          <script src="https://cdn.tailwindcss.com"></script>
+          <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
+        </head>
+        <body class="bg-transparent flex justify-center">
+          <div class="max-w-xl w-full">
+            <div class="bg-white/10 backdrop-blur-lg rounded-3xl p-8 text-center shadow-2xl">
+              <h2 class="text-3xl font-bold mb-6 text-white">Prediction Result</h2>
+              <div class="space-y-2 mb-6 text-white">
+                <p class="text-xl">Pass Probability: <span class="font-bold text-blue-300">{pass_prob*100:.2f}%</span></p>
+                <p class="text-xl">Predicted Marks: <span class="font-bold text-blue-300">{pred_marks:.2f} / 100</span></p>
+              </div>
+              <div class="text-[{res_color}] font-black text-5xl mb-6">🎉 RESULT: {res_text}</div>
+              <script>
+                if({str(pass_prob >= 0.5).lower()}) {{
+                    confetti({{ particleCount: 150, spread: 70, origin: {{ y: 0.6 }} }});
+                }}
+              </script>
             </div>
-        """, unsafe_allow_html=True)
-
-        # Confetti Effect
-        if pass_prob >= 0.5:
-            components.html("""
-                <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
-                <script>confetti({particleCount: 150, spread: 70, origin: {y: 0.6}});</script>
-            """, height=0)
-
-        # --- AI GRAPH SECTION ---
-        st.write("---")
-        st.markdown("<h3 style='text-align: center;'>📊 Machine Learning Visual Analysis</h3>", unsafe_allow_html=True)
+          </div>
+        </body>
+        </html>
+        """
         
-        
+        with col_mid:
+            components.html(html_code, height=350)
 
-        fig, ax = plt.subplots(figsize=(10, 5))
-        fig.patch.set_facecolor('#4B0082') 
-        ax.set_facecolor('#310055')
+            # --- GRAPH SECTION ---
+            st.write("---")
+            st.markdown("<h3 style='text-align: center;'>📊 Performance Analytics Graph</h3>", unsafe_allow_html=True)
+            
+            
 
-        # Dataset Plotting
-        ax.scatter(df['StudyHours'], df['Attendance'], c=df['ResultNumeric'], 
-                   cmap='RdYlGn', s=100, edgecolors='white', alpha=0.6, label='Dataset')
-        
-        # Current User Prediction Point (Star Marker)
-        ax.scatter(sh, at, color='cyan', marker='*', s=400, label='Your Data', edgecolors='white', linewidth=2)
+            fig, ax = plt.subplots(figsize=(10, 5))
+            fig.patch.set_facecolor('#4B0082') 
+            ax.set_facecolor('#ffffff10')
 
-        ax.set_xlabel('Study Hours', color='white')
-        ax.set_ylabel('Attendance (%)', color='white')
-        ax.tick_params(colors='white')
-        ax.legend(facecolor='#4B0082', labelcolor='white')
-        ax.grid(True, linestyle='--', alpha=0.2)
+            # Scatter plot of training data
+            ax.scatter(df['StudyHours'], df['Attendance'], c=df['ResultNumeric'], cmap='RdYlGn', s=100, label='Historical Data', alpha=0.5)
+            # User Data Point (The Star)
+            ax.scatter(sh, at, color='cyan', marker='*', s=300, label='Your Prediction', edgecolors='white')
 
-        st.pyplot(fig)
-
+            ax.set_xlabel('Study Hours', color='white')
+            ax.set_ylabel('Attendance (%)', color='white')
+            ax.tick_params(colors='white')
+            ax.legend()
+            st.pyplot(fig)
+            
     except ValueError:
         st.error("⚠️ Please enter valid numeric values.")
 
-st.markdown("<br><center><p style='opacity: 0.5;'>Built with ❤️ for AI/ML Project</p></center>", unsafe_allow_html=True)
+# Footer
+st.markdown("<br><center><p style='color: white; opacity: 0.5;'>AI/ML Project | Clean Interface</p></center>", unsafe_allow_html=True)
