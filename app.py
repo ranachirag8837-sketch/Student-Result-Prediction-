@@ -184,7 +184,7 @@ if predict_clicked:
 
             fig, ax = plt.subplots(figsize=(10, 5))
             fig.patch.set_facecolor('#4B0082') 
-            ax.set_facecolor('#ffffff10')
+            ax.set_facecolor('#fff')
 
             # Bar chart colors based on Pass/Fail status
             colors = ['#4ade80' if r == 1 else '#f87171' for r in df['ResultNumeric']]
@@ -216,3 +216,4 @@ if predict_clicked:
 
 # Footer
 st.markdown("<br><center><p style='color: white; opacity: 0.5;'>Predictor v2.3 | AI Analytics Dashboard</p></center>", unsafe_allow_html=True)
+
