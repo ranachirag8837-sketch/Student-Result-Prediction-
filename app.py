@@ -12,7 +12,7 @@ import streamlit.components.v1 as components
 st.set_page_config(
     page_title="🎓 Student Result Prediction AI",
     layout="wide"
-)
+) 
 
 # =============================
 # 2. Custom CSS (No Borders, Clean UI)
@@ -126,11 +126,21 @@ if predict_clicked:
         pass_prob = logistic_model.predict_proba(input_scaled)[0][1]
         pred_marks = min(float(linear_model.predict(input_scaled)[0]), 100.0)
 
-        # Determine result styling
+        # Recommendation Logic
+        if pass_prob >= 0.8:
+            rec_text = "તમારું પ્રદર્શન ઉત્કૃષ્ટ છે! સાતત્ય જાળવી રાખો અને અઘરા વિષયો પર ધ્યાન કેન્દ્રિત કરો."
+            rec_icon = "🚀"
+        elif pass_prob >= 0.5:
+            rec_text = "તમે સુરક્ષિત ઝોનમાં છો, પરંતુ માર્ક્સ સુધારવા માટે દરરોજ 1-2 કલાક વધુ મહેનત કરો."
+            rec_icon = "📈"
+        else:
+            rec_text = "ચેતવણી! તમારે તાત્કાલિક તમારી હાજરી અને અભ્યાસના કલાકો વધારવાની જરૂર છે."
+            rec_icon = "⚠️"
+
+        # Result Display HTML
         res_text = "PASS" if pass_prob >= 0.5 else "FAIL"
         res_color = "#4ade80" if pass_prob >= 0.5 else "#f87171"
 
-        # Result Display HTML
         html_code = f"""
         <html>
         <head>
@@ -146,6 +156,12 @@ if predict_clicked:
                 <p class="text-xl">Est. Marks: <span class="font-bold text-blue-300">{pred_marks:.1f} / 100</span></p>
               </div>
               <div class="text-[{res_color}] font-black text-5xl mb-4">{res_text}</div>
+              
+              <div class="mt-4 p-4 bg-black/30 rounded-xl text-left border-l-4 border-blue-400">
+                <p class="text-white text-sm"><b>{rec_icon} AI Recommendation:</b></p>
+                <p class="text-gray-200 text-sm italic">{rec_text}</p>
+              </div>
+
               <script>
                 if({str(pass_prob >= 0.5).lower()}) {{
                     confetti({{ particleCount: 150, spread: 70, origin: {{ y: 0.6 }} }});
@@ -158,7 +174,7 @@ if predict_clicked:
         """
         
         with col_mid:
-            components.html(html_code, height=350)
+            components.html(html_code, height=450)
 
             # --- ML BAR CHART SECTION ---
             st.write("---")
@@ -168,7 +184,7 @@ if predict_clicked:
 
             fig, ax = plt.subplots(figsize=(10, 5))
             fig.patch.set_facecolor('#4B0082') 
-            ax.set_facecolor('#fff')
+            ax.set_facecolor('#ffffff10')
 
             # Bar chart colors based on Pass/Fail status
             colors = ['#4ade80' if r == 1 else '#f87171' for r in df['ResultNumeric']]
@@ -199,5 +215,4 @@ if predict_clicked:
         st.error("⚠️ Please enter valid numeric values for Study Hours and Attendance.")
 
 # Footer
-st.markdown("<br><center><p style='color: white; opacity: 0.5;'>Predictor v2.2 | Bar Analytics Enabled</p></center>", unsafe_allow_html=True)
-
+st.markdown("<br><center><p style='color: white; opacity: 0.5;'>Predictor v2.3 | AI Recommendations Enabled</p></center>", unsafe_allow_html=True)
