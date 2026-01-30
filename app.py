@@ -167,7 +167,7 @@ if predict_clicked:
             
             fig, ax = plt.subplots(figsize=(10, 5))
             fig.patch.set_facecolor('#4B0082') 
-            ax.set_facecolor('#ffffff10')
+            ax.set_facecolor('#fff')
 
             # Scatter historical data
             ax.scatter(df['StudyHours'], df['Attendance'], c=df['ResultNumeric'], cmap='RdYlGn', s=100, label='Historical Data', alpha=0.5)
@@ -188,3 +188,4 @@ if predict_clicked:
 
 # Footer
 st.markdown("<br><center><p style='color: white; opacity: 0.5;'>Predictor v2.1 | Data Visualization Enabled</p></center>", unsafe_allow_html=True)
+
