@@ -170,10 +170,10 @@ if predict_clicked:
             ax.set_facecolor('#fff')
 
             # Scatter historical data
-            ax.scatter(df['StudyHours'], df['Attendance'], c=df['ResultNumeric'], cmap='RdYlGn', s=80, label='Historical Data', alpha=0.5)
+            ax.bar(df['StudyHours'], df['Attendance'], c=df['ResultNumeric'], cmap='RdYlGn', s=100, label='Historical Data', alpha=0.5)
             
             # Plot the User's current input as a large star
-            ax.scatter(sh, at, color='cyan', marker='*', s=400, label='Your Prediction', edgecolors='white', linewidth=2)
+            ax.bar(sh, at, color='cyan', marker='*', s=400, label='Your Prediction', edgecolors='white', linewidth=2)
 
             ax.set_xlabel('Study Hours', color='white', fontsize=12)
             ax.set_ylabel('Attendance (%)', color='white', fontsize=12)
@@ -188,5 +188,6 @@ if predict_clicked:
 
 # Footer
 st.markdown("<br><center><p style='color: white; opacity: 0.5;'>Predictor v2.1 | Data Visualization Enabled</p></center>", unsafe_allow_html=True)
+
 
 
