@@ -15,7 +15,7 @@ st.set_page_config(
 )
 
 # =============================
-# Custom CSS for Theme & Bordered Info Section
+# Custom CSS for Theme (Borders Removed)
 # =============================
 st.markdown("""
 <style>
@@ -25,9 +25,9 @@ st.markdown("""
         color: white;
     }
 
-    /* Info Border Container (Includes Header + Inputs) */
+    /* Info Container (No Border) */
     .info-border-box {
-        border: 2px solid rgba(255, 255, 255, 0.3);
+        border: none; /* બોર્ડર દૂર કરી */
         border-radius: 25px;
         padding: 40px;
         background-color: rgba(255, 255, 255, 0.05);
@@ -49,7 +49,7 @@ st.markdown("""
     .stTextInput > div > div > input {
         background-color: rgba(255, 255, 255, 0.9) !important;
         color: black !important;
-        border: 2px solid #ffffff !important;
+        border: none !important; /* ઇનપુટ બોક્સની બોર્ડર દૂર કરી */
         text-align: center;
         border-radius: 12px;
         height: 45px;
@@ -95,8 +95,7 @@ linear_model = LinearRegression().fit(X_scaled, df["TotalMarks"])
 col_left, col_mid, col_right = st.columns([1, 2, 1])
 
 with col_mid:
-    # --- START OF BORDERED BOX ---
-    # We use an opening div tag
+    # --- START OF CONTAINER ---
     st.markdown('<div class="info-border-box">', unsafe_allow_html=True)
     
     # Header Content
@@ -107,17 +106,16 @@ with col_mid:
         </p>
     """, unsafe_allow_html=True)
 
-    # Inputs (Called as proper Python functions, NOT inside a string)
+    # Inputs
     study_hours_input = st.text_input("📘 Study Hours (per day)", value="9")
     attendance_input = st.text_input("📊 Attendance (%)", value="80")
     predict_clicked = st.button("🌟 Predict Result") 
     
     # Closing the div tag
     st.markdown('</div>', unsafe_allow_html=True)
-    # --- END OF BORDERED BOX ---
 
 # =============================
-# Prediction Logic (Outside the border)
+# Prediction Logic
 # =============================
 if predict_clicked:
     try:
@@ -130,6 +128,7 @@ if predict_clicked:
         pass_prob = logistic_model.predict_proba(input_scaled)[0][1]
         pred_marks = min(float(linear_model.predict(input_scaled)[0]), 100.0)
 
+        # HTML code updated to remove Tailwind borders
         html_code = f"""
         <html>
         <head>
@@ -138,7 +137,7 @@ if predict_clicked:
         </head>
         <body class="bg-transparent flex justify-center">
           <div class="max-w-xl w-full">
-            <div class="bg-white/10 backdrop-blur-lg rounded-3xl p-8 text-center border border-white/20 shadow-2xl">
+            <div class="bg-white/10 backdrop-blur-lg rounded-3xl p-8 text-center shadow-2xl">
               <h2 class="text-3xl font-bold mb-6 text-white">Result</h2>
               <div class="space-y-2 mb-6 text-white">
                 <p class="text-xl text-gray-200">Pass Probability: <span class="font-bold text-blue-300">{pass_prob*100:.2f}%</span></p>
@@ -157,7 +156,7 @@ if predict_clicked:
             html_code += '<div class="text-red-400 font-black text-4xl mb-6">❌ RESULT: FAIL</div>'
 
         html_code += f"""
-              <div class="bg-black/40 p-5 rounded-2xl text-left border border-white/10">
+              <div class="bg-black/40 p-5 rounded-2xl text-left">
                 <h3 class="font-bold text-white mb-2 italic">📍 Recommendation:</h3>
                 <p class="text-gray-300">{"Keep up the excellent work!" if pred_marks > 70 else "Focus on consistency to improve marks."}</p>
               </div>
