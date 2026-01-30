@@ -126,15 +126,15 @@ if predict_clicked:
         pass_prob = logistic_model.predict_proba(input_scaled)[0][1]
         pred_marks = min(float(linear_model.predict(input_scaled)[0]), 100.0)
 
-        # Recommendation Logic
+        # Recommendation Logic (English)
         if pass_prob >= 0.8:
-            rec_text = "તમારું પ્રદર્શન ઉત્કૃષ્ટ છે! સાતત્ય જાળવી રાખો અને અઘરા વિષયો પર ધ્યાન કેન્દ્રિત કરો."
+            rec_text = "Excellent performance! Keep up the consistency and focus on advanced topics."
             rec_icon = "🚀"
         elif pass_prob >= 0.5:
-            rec_text = "તમે સુરક્ષિત ઝોનમાં છો, પરંતુ માર્ક્સ સુધારવા માટે દરરોજ 1-2 કલાક વધુ મહેનત કરો."
+            rec_text = "You are in the safe zone, but consider increasing study time by 1-2 hours to improve marks."
             rec_icon = "📈"
         else:
-            rec_text = "ચેતવણી! તમારે તાત્કાલિક તમારી હાજરી અને અભ્યાસના કલાકો વધારવાની જરૂર છે."
+            rec_text = "Warning! You need to increase both attendance and study hours immediately to pass."
             rec_icon = "⚠️"
 
         # Result Display HTML
@@ -152,8 +152,8 @@ if predict_clicked:
             <div class="bg-white/10 backdrop-blur-lg rounded-3xl p-8 text-center shadow-2xl">
               <h2 class="text-3xl font-bold mb-4 text-white">Prediction Result</h2>
               <div class="space-y-2 mb-6 text-white">
-                <p class="text-xl">Probability: <span class="font-bold text-blue-300">{pass_prob*100:.1f}%</span></p>
-                <p class="text-xl">Est. Marks: <span class="font-bold text-blue-300">{pred_marks:.1f} / 100</span></p>
+                <p class="text-xl">Pass Probability: <span class="font-bold text-blue-300">{pass_prob*100:.1f}%</span></p>
+                <p class="text-xl">Estimated Marks: <span class="font-bold text-blue-300">{pred_marks:.1f} / 100</span></p>
               </div>
               <div class="text-[{res_color}] font-black text-5xl mb-4">{res_text}</div>
               
@@ -212,7 +212,7 @@ if predict_clicked:
             st.pyplot(fig)
             
     except ValueError:
-        st.error("⚠️ Please enter valid numeric values for Study Hours and Attendance.")
+        st.error("⚠️ Please enter valid numeric values.")
 
 # Footer
-st.markdown("<br><center><p style='color: white; opacity: 0.5;'>Predictor v2.3 | AI Recommendations Enabled</p></center>", unsafe_allow_html=True)
+st.markdown("<br><center><p style='color: white; opacity: 0.5;'>Predictor v2.3 | AI Analytics Dashboard</p></center>", unsafe_allow_html=True)
