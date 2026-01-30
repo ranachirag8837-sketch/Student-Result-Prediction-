@@ -7,7 +7,7 @@ from sklearn.linear_model import LogisticRegression, LinearRegression
 import streamlit.components.v1 as components
 
 # =============================
-# Page Configuration
+# 1. Page Configuration
 # =============================
 st.set_page_config(
     page_title="🎓 Student Result Prediction AI",
@@ -15,7 +15,7 @@ st.set_page_config(
 )
 
 # =============================
-# Custom CSS (Borders Removed)
+# 2. Custom CSS (No Borders, Clean UI)
 # =============================
 st.markdown("""
 <style>
@@ -25,12 +25,12 @@ st.markdown("""
         color: white;
     }
 
-    /* Info Container (No Border) */
+    /* Main Container (Border Removed) */
     .info-border-box {
         border: none !important; 
         border-radius: 25px;
         padding: 40px;
-        background-color: rgba(255, 255, 255, 0.07);
+        background-color: rgba(255, 255, 255, 0.08);
         margin-top: 20px;
         margin-bottom: 20px;
         text-align: center;
@@ -55,7 +55,7 @@ st.markdown("""
         margin-bottom: 10px;
     }
 
-    /* Predict Button */
+    /* Predict Button Styling */
     div.stButton {
         text-align: center;
         margin-top: 25px;
@@ -73,7 +73,7 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 # =============================
-# Load Dataset & Training
+# 3. Load Dataset & Training
 # =============================
 df = pd.DataFrame({
     "StudyHours": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
@@ -90,7 +90,7 @@ logistic_model = LogisticRegression().fit(X_scaled, df["ResultNumeric"])
 linear_model = LinearRegression().fit(X_scaled, df["TotalMarks"])
 
 # =============================
-# Main Layout
+# 4. Main Layout
 # =============================
 col_left, col_mid, col_right = st.columns([1, 2, 1])
 
@@ -111,7 +111,7 @@ with col_mid:
     st.markdown('</div>', unsafe_allow_html=True)
 
 # =============================
-# Prediction Logic
+# 5. Prediction Logic & Visualization
 # =============================
 if predict_clicked:
     try:
@@ -122,14 +122,15 @@ if predict_clicked:
         input_data = pd.DataFrame([[sh, at]], columns=["StudyHours", "Attendance"])
         input_scaled = scaler.transform(input_data)
 
-        # Predict
+        # Predict using trained models
         pass_prob = logistic_model.predict_proba(input_scaled)[0][1]
         pred_marks = min(float(linear_model.predict(input_scaled)[0]), 100.0)
 
-        # Result Card HTML
+        # Determine result styling
         res_text = "PASS" if pass_prob >= 0.5 else "FAIL"
         res_color = "#4ade80" if pass_prob >= 0.5 else "#f87171"
 
+        # Result Display HTML
         html_code = f"""
         <html>
         <head>
@@ -139,12 +140,12 @@ if predict_clicked:
         <body class="bg-transparent flex justify-center">
           <div class="max-w-xl w-full">
             <div class="bg-white/10 backdrop-blur-lg rounded-3xl p-8 text-center shadow-2xl">
-              <h2 class="text-3xl font-bold mb-6 text-white">Prediction Result</h2>
+              <h2 class="text-3xl font-bold mb-4 text-white">Prediction Result</h2>
               <div class="space-y-2 mb-6 text-white">
-                <p class="text-xl">Pass Probability: <span class="font-bold text-blue-300">{pass_prob*100:.2f}%</span></p>
-                <p class="text-xl">Predicted Marks: <span class="font-bold text-blue-300">{pred_marks:.2f} / 100</span></p>
+                <p class="text-xl">Probability: <span class="font-bold text-blue-300">{pass_prob*100:.1f}%</span></p>
+                <p class="text-xl">Est. Marks: <span class="font-bold text-blue-300">{pred_marks:.1f} / 100</span></p>
               </div>
-              <div class="text-[{res_color}] font-black text-5xl mb-6">🎉 RESULT: {res_text}</div>
+              <div class="text-[{res_color}] font-black text-5xl mb-4">{res_text}</div>
               <script>
                 if({str(pass_prob >= 0.5).lower()}) {{
                     confetti({{ particleCount: 150, spread: 70, origin: {{ y: 0.6 }} }});
@@ -159,29 +160,31 @@ if predict_clicked:
         with col_mid:
             components.html(html_code, height=350)
 
-            # --- GRAPH SECTION ---
+            # --- ML GRAPH SECTION ---
             st.write("---")
-            st.markdown("<h3 style='text-align: center;'>📊 Performance Analytics Graph</h3>", unsafe_allow_html=True)
+            st.markdown("<h3 style='text-align: center;'>📊 Machine Learning Visual Analysis</h3>", unsafe_allow_html=True)
             
             
-
             fig, ax = plt.subplots(figsize=(10, 5))
             fig.patch.set_facecolor('#4B0082') 
             ax.set_facecolor('#ffffff10')
 
-            # Scatter plot of training data
+            # Scatter historical data
             ax.scatter(df['StudyHours'], df['Attendance'], c=df['ResultNumeric'], cmap='RdYlGn', s=100, label='Historical Data', alpha=0.5)
-            # User Data Point (The Star)
-            ax.scatter(sh, at, color='cyan', marker='*', s=300, label='Your Prediction', edgecolors='white')
+            
+            # Plot the User's current input as a large star
+            ax.scatter(sh, at, color='cyan', marker='*', s=400, label='Your Prediction', edgecolors='white', linewidth=2)
 
-            ax.set_xlabel('Study Hours', color='white')
-            ax.set_ylabel('Attendance (%)', color='white')
+            ax.set_xlabel('Study Hours', color='white', fontsize=12)
+            ax.set_ylabel('Attendance (%)', color='white', fontsize=12)
             ax.tick_params(colors='white')
-            ax.legend()
+            ax.legend(facecolor='#4B0082', labelcolor='white')
+            ax.grid(True, linestyle='--', alpha=0.2)
+            
             st.pyplot(fig)
             
     except ValueError:
-        st.error("⚠️ Please enter valid numeric values.")
+        st.error("⚠️ Please enter valid numeric values for Study Hours and Attendance.")
 
 # Footer
-st.markdown("<br><center><p style='color: white; opacity: 0.5;'>AI/ML Project | Clean Interface</p></center>", unsafe_allow_html=True)
+st.markdown("<br><center><p style='color: white; opacity: 0.5;'>Predictor v2.1 | Data Visualization Enabled</p></center>", unsafe_allow_html=True)
