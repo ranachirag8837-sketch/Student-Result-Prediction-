@@ -218,3 +218,4 @@ if predict_clicked:
 # Footer
 st.markdown("<br><center><p style='color: white; opacity: 0.5;'>Predictor v2.3 | AI Analytics Dashboard</p></center>", unsafe_allow_html=True)
 
+
