@@ -12,10 +12,10 @@ from sklearn.model_selection import train_test_split
 # -----------------------------------------
 ROOT_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
 
-# CSV full path
+
 CSV_PATH = os.path.join(ROOT_DIR, "data", "student_data.csv")
 
-# Check file exists
+
 if not os.path.exists(CSV_PATH):
     raise FileNotFoundError(f"CSV file not found at: {CSV_PATH}")
 
@@ -59,3 +59,4 @@ joblib.dump(model, os.path.join(MODEL_DIR, "logistic_model.pkl"))
 joblib.dump(scaler, os.path.join(MODEL_DIR, "scaler.pkl"))
 
 print("✅ logistic_model.pkl created successfully")
+
