@@ -105,8 +105,8 @@ with col_mid:
         </p>
     """, unsafe_allow_html=True)
 
-    study_hours_input = st.text_input("📘 Study Hours (per day)", value="8")
-    attendance_input = st.text_input("📊 Attendance (%)", value="85")
+    study_hours_input = st.text_input("📘 Study Hours (per day)")
+    attendance_input = st.text_input("📊 Attendance (%)")
     predict_clicked = st.button("🌟 Predict Result") 
     
     st.markdown('</div>', unsafe_allow_html=True)
@@ -206,6 +206,7 @@ if predict_clicked:
         st.error("⚠️ Please enter valid numeric values.")
 
 st.markdown("<br><center><p style='color: white; opacity: 0.5;'>Predictor v2.3 | AI Analytics Dashboard</p></center>", unsafe_allow_html=True)
+
 
 
 
