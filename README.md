@@ -59,6 +59,7 @@ Student_Result_Prediction_System/
 │
 ├── README.md                     # Project documentation
 ├── requirements.txt              # Python dependencies
+|-- screesoot.jpg
 │
 └── .gitignore (optional)         # Git ignored files
 
