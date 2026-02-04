@@ -23,7 +23,7 @@ st.markdown("""
     color: white;
 }
 .info-box {
-    background: rgba(255,255,255,0.08);
+    background: rgba(255,255,255,0.1);
     border-radius: 25px;
     padding: 35px;
     text-align: center;
@@ -59,7 +59,7 @@ col1, col2, col3 = st.columns([1,2,1])
 with col2:
     st.markdown('<div class="info-box">', unsafe_allow_html=True)
     st.markdown("<h1>Student Result Prediction</h1>", unsafe_allow_html=True)
-    st.markdown("<p>Hybrid ML Model</p>", unsafe_allow_html=True)
+    st.markdown("<p>Hybrid ML Model (Pass / Fail + Marks)</p>", unsafe_allow_html=True)
 
     sh = st.text_input("Study Hours", "8")
     at = st.text_input("Attendance %", "85")
@@ -77,7 +77,6 @@ if predict:
     pass_prob = log_model.predict_proba(inp)[0][1]
     marks = min(lin_model.predict(inp)[0], 100)
 
-    # Dynamic logic
     if pass_prob >= 0.8:
         level = "Excellent"
         color = "#22c55e"
@@ -95,7 +94,7 @@ if predict:
 
     with col2:
         # =============================
-        # ✅ Prediction Result Card (TEXT WHITE)
+        # Prediction Result
         # =============================
         components.html(f"""
         <div style="
@@ -103,19 +102,18 @@ if predict:
             padding:30px;
             border-radius:25px;
             text-align:center;
-            color:white;
-        ">
-            <h2 style="color:white;">Prediction Result</h2>
-            <p style="color:white;">Pass Probability: <b>{pass_prob*100:.1f}%</b></p>
-            <p style="color:white;">Estimated Marks: <b>{marks:.1f}/100</b></p>
-            <h1 style="color:{color}; font-weight:800;">
+            color:white;">
+            <h2>Prediction Result</h2>
+            <p>Pass Probability: <b>{pass_prob*100:.1f}%</b></p>
+            <p>Estimated Marks: <b>{marks:.1f}/100</b></p>
+            <h1 style="color:{color};">
                 {'PASS' if pass_prob >= 0.5 else 'FAIL'}
             </h1>
         </div>
         """, height=260)
 
         # =============================
-        # Advanced Features Section
+        # Advanced Features (UPDATED)
         # =============================
         components.html(f"""
         <div style="
@@ -123,39 +121,51 @@ if predict:
             background:linear-gradient(135deg,#6a11cb,#2575fc);
             border-radius:25px;
             padding:35px;
-            color:white;
-            box-shadow:0 15px 30px rgba(0,0,0,0.35);
-        ">
+            color:white;">
+            
             <h2>Advanced Features & Recommendations</h2>
 
-            <p><b>1. Personalized Study Plan:</b>
+            <p><b>Personalized Study Plan:</b>
             <span style="color:{color}; font-weight:bold;"> {level}</span></p>
 
             <div style="background:rgba(255,255,255,0.25);
                         border-radius:10px;
                         overflow:hidden;
-                        margin-bottom:15px;">
+                        margin-bottom:20px;">
                 <div style="width:{progress}%;
                             background:{color};
                             padding:6px;"></div>
             </div>
 
-            <p><b>2. Topic-wise Analysis:</b> Detailed performance by subject.</p>
-            <p><b>3. Peer Comparison:</b> Anonymous comparative statistics.</p>
-            <p><b>4. Goal Setting & Tracking:</b> Smart progress monitoring.</p>
-            <p><b>5. Tutor Connect:</b> AI or Human tutor support.</p>
+            <h3>📌 Topic-wise Performance</h3>
+
+            <div style="background:rgba(0,0,0,0.25); padding:15px; border-radius:12px; margin-bottom:10px;">
+                <b>📘 Mathematics:</b> Concept clear, improve speed.
+            </div>
+
+            <div style="background:rgba(0,0,0,0.25); padding:15px; border-radius:12px; margin-bottom:10px;">
+                <b>💻 Programming:</b> Good logic, practice projects.
+            </div>
+
+            <div style="background:rgba(0,0,0,0.25); padding:15px; border-radius:12px; margin-bottom:10px;">
+                <b>📊 Data Analysis:</b> Data handling strong, focus on charts.
+            </div>
+
+            <div style="background:rgba(0,0,0,0.25); padding:15px; border-radius:12px; margin-bottom:10px;">
+                <b>🤖 Machine Learning:</b> Models understood, try tuning.
+            </div>
 
             <div style="
                 margin-top:20px;
                 padding:15px;
-                background:rgba(0,0,0,0.25);
+                background:rgba(0,0,0,0.3);
                 border-left:5px solid {color};
                 border-radius:10px;">
                 <b>AI Recommendation:</b><br>
                 {advice}
             </div>
         </div>
-        """, height=420)
+        """, height=520)
 
         # =============================
         # Graph
@@ -172,6 +182,6 @@ if predict:
 # Footer
 # =============================
 st.markdown(
-    "<center style='opacity:0.5;'>Predictor v2.3 | AI Analytics Dashboard</center>",
+    "<center style='opacity:0.5;'>Predictor v2.5 | AI Analytics Dashboard</center>",
     unsafe_allow_html=True
 )
