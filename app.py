@@ -80,8 +80,8 @@ with col2:
     st.markdown("<h1>Student Result Prediction</h1>", unsafe_allow_html=True)
     st.markdown("<p>Hybrid ML Model (Pass / Fail + Marks)</p>", unsafe_allow_html=True)
 
-    sh = st.text_input("Study Hours", "8")
-    at = st.text_input("Attendance %", "85")
+    sh = st.text_input("Study Hours")
+    at = st.text_input("Attendance %")
     predict = st.button("Predict")
 
     st.markdown("</div>", unsafe_allow_html=True)
@@ -209,3 +209,4 @@ st.markdown(
     "<center style='opacity:0.6;'>Predictor v2.6 | AI Analytics Dashboard</center>",
     unsafe_allow_html=True
 )
+
