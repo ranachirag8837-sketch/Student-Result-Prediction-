@@ -15,7 +15,7 @@ st.set_page_config(
 )
 
 # =============================
-# CSS (Smaller Size & Center Alignment)
+# CSS (FIXED TEXTBOX COLOR)
 # =============================
 st.markdown("""
 <style>
@@ -24,49 +24,32 @@ st.markdown("""
     color: white;
 }
 
-/* Centering the input labels */
-.stTextInput label {
-    display: flex;
-    justify-content: center;
-    font-size: 14px !important;
-    font-weight: bold;
+/* Input Card */
+.info-box {
+    background: rgba(255,255,255,0.12);
+    border-radius: 25px;
+    padding: 35px;
+    text-align: center;
 }
 
-/* Smaller Input Box */
+/* Text Input Box */
 .stTextInput > div > div > input {
     background-color: white !important;
     color: black !important;
-    border-radius: 10px;
-    height: 35px; /* Reduced height */
+    border-radius: 12px;
+    height: 45px;
     text-align: center;
-    font-size: 14px;
-    width: 60% !important; /* Smaller width */
-    margin: auto;
+    font-size: 16px;
 }
 
-/* Smaller Centered Button */
-.stButton {
-    display: flex;
-    justify-content: center;
-}
-
+/* Button */
 .stButton > button {
     background-color: #2563eb;
     color: white;
-    border-radius: 10px;
-    height: 38px; /* Reduced height */
-    width: 120px; /* Reduced width */
-    font-size: 14px;
+    border-radius: 12px;
+    height: 45px;
+    font-size: 16px;
     font-weight: bold;
-    border: none;
-    margin-top: 10px;
-}
-
-.info-box {
-    background: rgba(255,255,255,0.12);
-    border-radius: 20px;
-    padding: 25px;
-    text-align: center;
 }
 </style>
 """, unsafe_allow_html=True)
@@ -89,14 +72,14 @@ log_model = LogisticRegression().fit(X_scaled, df["Result"])
 lin_model = LinearRegression().fit(X_scaled, df["Marks"])
 
 # =============================
-# UI INPUT (CENTERED)
+# UI INPUT (CENTER)
 # =============================
-col1, col2, col3 = st.columns([1,1.5,1]) # Adjusted column ratio for better focus
+col1, col2, col3 = st.columns([1,2,1])
 
 with col2:
     st.markdown('<div class="info-box">', unsafe_allow_html=True)
-    st.markdown("<h2 style='margin-bottom:0;'>Student Result Prediction</h2>", unsafe_allow_html=True)
-    st.markdown("<p style='font-size:12px; opacity:0.8;'>Hybrid ML Model (Pass / Fail + Marks)</p>", unsafe_allow_html=True)
+    st.markdown("<h1>Student Result Prediction</h1>", unsafe_allow_html=True)
+    st.markdown("<p>Hybrid ML Model (Pass / Fail + Marks)</p>", unsafe_allow_html=True)
 
     sh = st.text_input("Study Hours", "8")
     at = st.text_input("Attendance %", "85")
@@ -105,48 +88,125 @@ with col2:
     st.markdown("</div>", unsafe_allow_html=True)
 
 # =============================
-# Prediction Logic
+# Prediction
 # =============================
 if predict:
-    sh_val = float(sh)
-    at_val = float(at)
+    sh = float(sh)
+    at = float(at)
 
-    inp = scaler.transform([[sh_val, at_val]])
+    inp = scaler.transform([[sh, at]])
     pass_prob = log_model.predict_proba(inp)[0][1]
     marks = min(lin_model.predict(inp)[0], 100)
 
-    color = "#22c55e" if pass_prob >= 0.5 else "#ef4444"
-    level = "Excellent" if pass_prob >= 0.8 else "Good" if pass_prob >= 0.6 else "Needs Improvement"
-    advice = "Maintain consistency." if pass_prob >= 0.8 else "Focus on weak areas." if pass_prob >= 0.6 else "Increase effort immediately."
+    if pass_prob >= 0.8:
+        level = "Excellent"
+        color = "#22c55e"
+        advice = "You are doing great. Maintain consistency and revise weekly."
+    elif pass_prob >= 0.6:
+        level = "Good"
+        color = "#facc15"
+        advice = "You are close to success. Focus more on weak subjects."
+    else:
+        level = "Needs Improvement"
+        color = "#ef4444"
+        advice = "Increase study hours and attendance immediately."
+
     progress = int(pass_prob * 100)
 
+    # =============================
+    # Prediction Result
+    # =============================
     with col2:
-        st.markdown("<br>", unsafe_allow_html=True)
         components.html(f"""
-        <div style="background:rgba(255,255,255,0.18); padding:20px; border-radius:20px; text-align:center; color:white; font-family:sans-serif;">
-            <h3 style="margin:0;">Result</h3>
-            <p style="margin:5px 0;">Marks: <b>{marks:.1f}/100</b></p>
-            <h1 style="color:{color}; margin:10px 0;">{'PASS' if pass_prob >= 0.5 else 'FAIL'}</h1>
+        <div style="
+            background:rgba(255,255,255,0.18);
+            padding:30px;
+            border-radius:25px;
+            text-align:center;
+            color:white;">
+            <h2>Prediction Result</h2>
+            <p>Pass Probability: <b>{pass_prob*100:.1f}%</b></p>
+            <p>Estimated Marks: <b>{marks:.1f}/100</b></p>
+            <h1 style="color:{color}; font-weight:800;">
+                {'PASS' if pass_prob >= 0.5 else 'FAIL'}
+            </h1>
         </div>
-        """, height=180)
+        """, height=260)
 
-    # Advanced Features (Full Width)
-    st.markdown("---")
+    # =============================
+    # FULL SCREEN ADVANCED FEATURES
+    # =============================
     components.html(f"""
-    <div style="width:100%; background:linear-gradient(135deg,#6a11cb,#2575fc); border-radius:25px; padding:30px; color:white; font-family:sans-serif;">
-        <h2>Advanced Recommendations</h2>
-        <p>Status: <b style="color:{color}">{level}</b></p>
-        <div style="background:rgba(255,255,255,0.2); border-radius:10px; height:15px; width:100%; margin-bottom:20px;">
-            <div style="background:{color}; width:{progress}%; height:100%; border-radius:10px;"></div>
+    <div style="
+        margin-top:40px;
+        width:100%;
+        background:linear-gradient(135deg,#6a11cb,#2575fc);
+        border-radius:30px;
+        padding:45px;
+        color:white;
+        box-shadow:0 20px 40px rgba(0,0,0,0.35);
+    ">
+        <h1>Advanced Features & Recommendations</h1>
+
+        <p style="font-size:18px;">
+            <b>Personalized Study Plan:</b>
+            <span style="color:{color}; font-weight:bold;"> {level}</span>
+        </p>
+
+        <div style="background:rgba(255,255,255,0.25);
+                    border-radius:12px;
+                    overflow:hidden;
+                    margin-bottom:25px;">
+            <div style="width:{progress}%;
+                        background:{color};
+                        padding:8px;"></div>
         </div>
-        <p><b>AI Advice:</b> {advice}</p>
+
+        <h2>📌 Topic-wise Performance</h2>
+
+        <div style="background:rgba(0,0,0,0.25); padding:18px; border-radius:15px; margin-bottom:12px;">
+            📘 <b>Mathematics:</b> Concept clear, improve speed.
+        </div>
+
+        <div style="background:rgba(0,0,0,0.25); padding:18px; border-radius:15px; margin-bottom:12px;">
+            💻 <b>Programming:</b> Good logic, practice projects.
+        </div>
+
+        <div style="background:rgba(0,0,0,0.25); padding:18px; border-radius:15px; margin-bottom:12px;">
+            📊 <b>Data Analysis:</b> Data handling strong, focus on charts.
+        </div>
+
+        <div style="background:rgba(0,0,0,0.25); padding:18px; border-radius:15px; margin-bottom:12px;">
+            🤖 <b>Machine Learning:</b> Models understood, try tuning.
+        </div>
+
+        <div style="
+            margin-top:25px;
+            padding:20px;
+            background:rgba(0,0,0,0.35);
+            border-left:6px solid {color};
+            border-radius:15px;">
+            <b>AI Recommendation:</b><br>
+            {advice}
+        </div>
     </div>
-    """, height=250)
+    """, height=650)
+
+    # =============================
+    # Graph
+    # =============================
+    fig, ax = plt.subplots()
+    fig.patch.set_facecolor('#4B0082')
+    ax.bar(df["StudyHours"], df["Attendance"], alpha=0.5)
+    ax.bar(sh, at, width=0.4)
+    ax.set_xlabel("Study Hours")
+    ax.set_ylabel("Attendance %")
+    st.pyplot(fig)
 
 # =============================
 # Footer
 # =============================
 st.markdown(
-    "<br><center style='opacity:0.6; font-size:12px;'>Predictor v2.6 | AI Analytics Dashboard</center>",
+    "<center style='opacity:0.6;'>Predictor v2.6 | AI Analytics Dashboard</center>",
     unsafe_allow_html=True
 )
