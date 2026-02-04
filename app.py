@@ -197,7 +197,7 @@ if predict:
     
     # Generate Line Data
     fig, ax = plt.subplots(figsize=(10, 4))
-    fig.patch.set_facecolor('#fff') # Match app background
+    fig.patch.set_facecolor('#4B0082') # Match app background
     ax.set_facecolor('#4B0082')
 
     # Plot the general trend line
