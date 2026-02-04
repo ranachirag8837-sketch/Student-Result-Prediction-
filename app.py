@@ -94,20 +94,29 @@ if predict:
     progress = int(pass_prob * 100)
 
     with col2:
-        # Result Card
+        # =============================
+        # ✅ Prediction Result Card (TEXT WHITE)
+        # =============================
         components.html(f"""
-        <div style="background:rgba(255,255,255,0.15);
-                    padding:25px;
-                    border-radius:20px;
-                    text-align:center;">
-            <h2>Prediction Result</h2>
-            <p>Pass Probability: <b>{pass_prob*100:.1f}%</b></p>
-            <p>Estimated Marks: <b>{marks:.1f}/100</b></p>
-            <h1 style="color:{color};">{'PASS' if pass_prob>=0.5 else 'FAIL'}</h1>
+        <div style="
+            background:rgba(255,255,255,0.15);
+            padding:30px;
+            border-radius:25px;
+            text-align:center;
+            color:white;
+        ">
+            <h2 style="color:white;">Prediction Result</h2>
+            <p style="color:white;">Pass Probability: <b>{pass_prob*100:.1f}%</b></p>
+            <p style="color:white;">Estimated Marks: <b>{marks:.1f}/100</b></p>
+            <h1 style="color:{color}; font-weight:800;">
+                {'PASS' if pass_prob >= 0.5 else 'FAIL'}
+            </h1>
         </div>
         """, height=260)
 
-        # ✅ FIXED ADVANCED FEATURES (NO HTML TEXT ERROR)
+        # =============================
+        # Advanced Features Section
+        # =============================
         components.html(f"""
         <div style="
             margin-top:30px;
@@ -148,7 +157,9 @@ if predict:
         </div>
         """, height=420)
 
+        # =============================
         # Graph
+        # =============================
         fig, ax = plt.subplots()
         fig.patch.set_facecolor('#4B0082')
         ax.bar(df["StudyHours"], df["Attendance"], alpha=0.5)
@@ -157,6 +168,9 @@ if predict:
         ax.set_ylabel("Attendance %")
         st.pyplot(fig)
 
+# =============================
+# Footer
+# =============================
 st.markdown(
     "<center style='opacity:0.5;'>Predictor v2.3 | AI Analytics Dashboard</center>",
     unsafe_allow_html=True
