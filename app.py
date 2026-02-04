@@ -182,7 +182,7 @@ if predict:
     st.write("## 📈 Marks Trend vs Study Hours")
     
     fig, ax = plt.subplots(figsize=(10, 4))
-    fig.patch.set_facecolor('#4B0082') # Match app background
+    fig.patch.set_facecolor('#Black') # Match app background
     ax.set_facecolor('#4B0082')
 
     # Plot trend line from data
@@ -207,3 +207,4 @@ if predict:
     st.pyplot(fig)
 
 st.markdown("<br><hr><center style='opacity:0.3; color:white;'>Predictor AI v2.6</center>", unsafe_allow_html=True)
+
