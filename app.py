@@ -15,7 +15,7 @@ st.set_page_config(
 )
 
 # =============================
-# CSS (Custom Styling for Centering and Big Button)
+# CSS (Centering Text and Large Button)
 # =============================
 st.markdown("""
 <style>
@@ -24,25 +24,25 @@ st.markdown("""
     color: white;
 }
 
-/* Container for the Input Box */
+/* Input Card Container */
 .info-box {
     background: rgba(255,255,255,0.12);
     border-radius: 25px;
-    padding: 35px;
+    padding: 40px;
     text-align: center;
 }
 
-/* Centering the Labels of Text Input */
+/* Centering Input Labels */
 .stTextInput label {
-    display: block;
-    text-align: center;
+    display: block !important;
+    text-align: center !important;
     width: 100%;
     color: white !important;
     font-size: 18px !important;
-    font-weight: bold;
+    font-weight: 600;
 }
 
-/* Styling the Input Box itself */
+/* Centering Input Box Text */
 .stTextInput > div > div > input {
     background-color: white !important;
     color: black !important;
@@ -52,23 +52,25 @@ st.markdown("""
     font-size: 16px;
 }
 
-/* Making the Predict Button BIG (Full Width) */
+/* BIG Predict Button Styling */
 .stButton > button {
     background-color: #2563eb;
     color: white;
     border-radius: 12px;
-    width: 100%;  /* બટનને મોટું કરવા માટે */
-    height: 55px; /* બટનની ઉંચાઈ વધારવા માટે */
-    font-size: 20px;
+    width: 100% !important;  /* Makes button wide */
+    height: 60px !important; /* Makes button tall */
+    font-size: 22px !important;
     font-weight: bold;
     border: none;
-    margin-top: 20px;
+    margin-top: 25px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.3);
     transition: 0.3s;
 }
 
 .stButton > button:hover {
     background-color: #1d4ed8;
-    transform: scale(1.02);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(0,0,0,0.4);
 }
 </style>
 """, unsafe_allow_html=True)
@@ -77,10 +79,10 @@ st.markdown("""
 # Dataset & Models
 # =============================
 df = pd.DataFrame({
-    "StudyHours": [1,2,3,4,5,6,7,8,9,10],
-    "Attendance": [40,45,50,60,65,75,80,85,90,95],
-    "Result": [0,0,0,0,1,1,1,1,1,1],
-    "Marks": [25,30,38,45,55,68,75,82,88,95]
+    "StudyHours": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+    "Attendance": [40, 45, 50, 60, 65, 75, 80, 85, 90, 95],
+    "Result": [0, 0, 0, 0, 1, 1, 1, 1, 1, 1],
+    "Marks": [25, 30, 38, 45, 55, 68, 75, 82, 88, 95]
 })
 
 X = df[["StudyHours", "Attendance"]]
@@ -91,26 +93,26 @@ log_model = LogisticRegression().fit(X_scaled, df["Result"])
 lin_model = LinearRegression().fit(X_scaled, df["Marks"])
 
 # =============================
-# UI INPUT (CENTERED)
+# UI Layout
 # =============================
 col1, col2, col3 = st.columns([1, 2, 1])
 
 with col2:
     st.markdown('<div class="info-box">', unsafe_allow_html=True)
-    st.markdown("<h1 style='text-align: center;'>🎓 Student Result Prediction</h1>", unsafe_allow_html=True)
-    st.markdown("<p style='text-align: center; opacity: 0.8;'>Hybrid ML Model (Pass / Fail + Marks)</p>", unsafe_allow_html=True)
+    st.markdown("<h1 style='margin-bottom:0;'>🎓 Student Prediction</h1>", unsafe_allow_html=True)
+    st.markdown("<p style='opacity:0.8; margin-bottom:30px;'>Hybrid ML Model (Pass/Fail + Marks)</p>", unsafe_allow_html=True)
 
-    # Inputs
-    sh = st.text_input("Study Hours", placeholder="e.g. 5")
-    at = st.text_input("Attendance %", placeholder="e.g. 75")
+    # Input Fields (Labels are centered via CSS)
+    sh = st.text_input("Study Hours", placeholder="Enter hours (e.g. 7)")
+    at = st.text_input("Attendance %", placeholder="Enter percentage (e.g. 85)")
     
-    # Big Button
-    predict = st.button("Predict Now")
+    # Large Predict Button
+    predict = st.button("Predict Result")
     
     st.markdown("</div>", unsafe_allow_html=True)
 
 # =============================
-# Prediction Result Section
+# Prediction Output
 # =============================
 if predict:
     if sh and at:
@@ -118,12 +120,13 @@ if predict:
             sh_val = float(sh)
             at_val = float(at)
 
+            # Process Prediction
             inp = scaler.transform([[sh_val, at_val]])
             pass_prob = log_model.predict_proba(inp)[0][1]
             marks = min(lin_model.predict(inp)[0], 100)
 
-            color = "#22c55e" if pass_prob >= 0.5 else "#ef4444"
-            status = "PASS" if pass_prob >= 0.5 else "FAIL"
+            result_color = "#22c55e" if pass_prob >= 0.5 else "#ef4444"
+            result_text = "PASS" if pass_prob >= 0.5 else "FAIL"
 
             with col2:
                 st.markdown("<br>", unsafe_allow_html=True)
@@ -134,23 +137,24 @@ if predict:
                     border-radius:25px;
                     text-align:center;
                     color:white;
-                    font-family: sans-serif;
-                    border: 2px solid {color};">
-                    <h2 style="margin:0;">Result Overview</h2>
-                    <p style="font-size:18px;">Marks Estimate: <b>{marks:.1f}/100</b></p>
-                    <h1 style="color:{color}; font-size: 60px; margin:10px 0;">{status}</h1>
-                    <p>Confidence: {pass_prob*100:.1f}%</p>
+                    font-family: Arial, sans-serif;
+                    border: 2px solid {result_color};">
+                    <h2 style="margin:0; opacity:0.9;">Prediction Summary</h2>
+                    <p style="font-size:20px; margin:10px 0;">Estimated Marks: <b>{marks:.1f}/100</b></p>
+                    <h1 style="color:{result_color}; font-size: 65px; margin:15px 0; letter-spacing:2px;">{result_text}</h1>
+                    <p style="opacity:0.8;">Probability: {pass_prob*100:.1f}%</p>
                 </div>
-                """, height=280)
+                """, height=300)
+                
         except ValueError:
-            st.error("કૃપા કરીને ફક્ત નંબર દાખલ કરો.")
+            st.error("Invalid Input! Please enter numbers only.")
     else:
-        st.warning("બંને ખાનામાં વિગતો ભરો.")
+        st.warning("Please fill in both fields before predicting.")
 
 # =============================
 # Footer
 # =============================
 st.markdown(
-    "<br><hr><center style='opacity:0.5;'>Predictor v2.6 | Powered by AI Analytics</center>",
+    "<br><hr><center style='opacity:0.5; font-size:14px;'>Predictor v2.6 | AI Analytics Dashboard</center>",
     unsafe_allow_html=True
 )
