@@ -23,7 +23,7 @@ st.markdown("""
     color: white;
 }
 .info-box {
-    background: rgba(255,255,255,0.1);
+    background: rgba(255,255,255,0.12);
     border-radius: 25px;
     padding: 35px;
     text-align: center;
@@ -52,7 +52,7 @@ log_model = LogisticRegression().fit(X_scaled, df["Result"])
 lin_model = LinearRegression().fit(X_scaled, df["Marks"])
 
 # =============================
-# UI
+# UI INPUT (CENTER)
 # =============================
 col1, col2, col3 = st.columns([1,2,1])
 
@@ -92,13 +92,13 @@ if predict:
 
     progress = int(pass_prob * 100)
 
+    # =============================
+    # Prediction Result (CENTER)
+    # =============================
     with col2:
-        # =============================
-        # Prediction Result
-        # =============================
         components.html(f"""
         <div style="
-            background:rgba(255,255,255,0.15);
+            background:rgba(255,255,255,0.18);
             padding:30px;
             border-radius:25px;
             text-align:center;
@@ -106,82 +106,86 @@ if predict:
             <h2>Prediction Result</h2>
             <p>Pass Probability: <b>{pass_prob*100:.1f}%</b></p>
             <p>Estimated Marks: <b>{marks:.1f}/100</b></p>
-            <h1 style="color:{color};">
+            <h1 style="color:{color}; font-weight:800;">
                 {'PASS' if pass_prob >= 0.5 else 'FAIL'}
             </h1>
         </div>
         """, height=260)
 
-        # =============================
-        # Advanced Features (UPDATED)
-        # =============================
-        components.html(f"""
-        <div style="
-            margin-top:30px;
-            background:linear-gradient(135deg,#6a11cb,#2575fc);
-            border-radius:25px;
-            padding:35px;
-            color:white;">
-            
-            <h2>Advanced Features & Recommendations</h2>
+    # =============================
+    # FULL SCREEN ADVANCED FEATURES
+    # =============================
+    components.html(f"""
+    <div style="
+        margin-top:40px;
+        width:100%;
+        background:linear-gradient(135deg,#6a11cb,#2575fc);
+        border-radius:30px;
+        padding:45px;
+        color:white;
+        box-shadow:0 20px 40px rgba(0,0,0,0.35);
+    ">
+        <h1>Advanced Features & Recommendations</h1>
 
-            <p><b>Personalized Study Plan:</b>
-            <span style="color:{color}; font-weight:bold;"> {level}</span></p>
+        <p style="font-size:18px;">
+            <b>Personalized Study Plan:</b>
+            <span style="color:{color}; font-weight:bold;"> {level}</span>
+        </p>
 
-            <div style="background:rgba(255,255,255,0.25);
-                        border-radius:10px;
-                        overflow:hidden;
-                        margin-bottom:20px;">
-                <div style="width:{progress}%;
-                            background:{color};
-                            padding:6px;"></div>
-            </div>
-
-            <h3>📌 Topic-wise Performance</h3>
-
-            <div style="background:rgba(0,0,0,0.25); padding:15px; border-radius:12px; margin-bottom:10px;">
-                <b>📘 Mathematics:</b> Concept clear, improve speed.
-            </div>
-
-            <div style="background:rgba(0,0,0,0.25); padding:15px; border-radius:12px; margin-bottom:10px;">
-                <b>💻 Programming:</b> Good logic, practice projects.
-            </div>
-
-            <div style="background:rgba(0,0,0,0.25); padding:15px; border-radius:12px; margin-bottom:10px;">
-                <b>📊 Data Analysis:</b> Data handling strong, focus on charts.
-            </div>
-
-            <div style="background:rgba(0,0,0,0.25); padding:15px; border-radius:12px; margin-bottom:10px;">
-                <b>🤖 Machine Learning:</b> Models understood, try tuning.
-            </div>
-
-            <div style="
-                margin-top:20px;
-                padding:15px;
-                background:rgba(0,0,0,0.3);
-                border-left:5px solid {color};
-                border-radius:10px;">
-                <b>AI Recommendation:</b><br>
-                {advice}
-            </div>
+        <div style="background:rgba(255,255,255,0.25);
+                    border-radius:12px;
+                    overflow:hidden;
+                    margin-bottom:25px;">
+            <div style="width:{progress}%;
+                        background:{color};
+                        padding:8px;"></div>
         </div>
-        """, height=520)
 
-        # =============================
-        # Graph
-        # =============================
-        fig, ax = plt.subplots()
-        fig.patch.set_facecolor('#4B0082')
-        ax.bar(df["StudyHours"], df["Attendance"], alpha=0.5)
-        ax.bar(sh, at, width=0.4)
-        ax.set_xlabel("Study Hours")
-        ax.set_ylabel("Attendance %")
-        st.pyplot(fig)
+        <h2>📌 Topic-wise Performance</h2>
+
+        <div style="background:rgba(0,0,0,0.25); padding:18px; border-radius:15px; margin-bottom:12px;">
+            📘 <b>Mathematics:</b> Concept clear, improve speed.
+        </div>
+
+        <div style="background:rgba(0,0,0,0.25); padding:18px; border-radius:15px; margin-bottom:12px;">
+            💻 <b>Programming:</b> Good logic, practice projects.
+        </div>
+
+        <div style="background:rgba(0,0,0,0.25); padding:18px; border-radius:15px; margin-bottom:12px;">
+            📊 <b>Data Analysis:</b> Data handling strong, focus on charts.
+        </div>
+
+        <div style="background:rgba(0,0,0,0.25); padding:18px; border-radius:15px; margin-bottom:12px;">
+            🤖 <b>Machine Learning:</b> Models understood, try tuning.
+        </div>
+
+        <div style="
+            margin-top:25px;
+            padding:20px;
+            background:rgba(0,0,0,0.35);
+            border-left:6px solid {color};
+            border-radius:15px;">
+            <b>AI Recommendation:</b><br>
+            {advice}
+        </div>
+    </div>
+    """, height=650)
+
+    # =============================
+    # Graph
+    # =============================
+    fig, ax = plt.subplots()
+    fig.patch.set_facecolor('#4B0082')
+    ax.bar(df["StudyHours"], df["Attendance"], alpha=0.5)
+    ax.bar(sh, at, width=0.4)
+    ax.set_xlabel("Study Hours")
+    ax.set_ylabel("Attendance %")
+    st.pyplot(fig)
 
 # =============================
 # Footer
 # =============================
 st.markdown(
-    "<center style='opacity:0.5;'>Predictor v2.5 | AI Analytics Dashboard</center>",
+    "<center style='opacity:0.6;'>Predictor v2.5 | AI Analytics Dashboard</center>",
     unsafe_allow_html=True
 )
