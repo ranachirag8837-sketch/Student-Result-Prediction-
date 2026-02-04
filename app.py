@@ -176,4 +176,34 @@ if predict:
     </div>
     """, height=580)
 
-st.markdown("<br><hr><center style='opacity:0.3;'>Predictor AI v2.6</center>", unsafe_allow_html=True)
+    # =============================
+    # 3. PERFORMANCE LINE CHART
+    # =============================
+    st.write("## 📈 Marks Trend vs Study Hours")
+    
+    fig, ax = plt.subplots(figsize=(10, 4))
+    fig.patch.set_facecolor('#4B0082') # Match app background
+    ax.set_facecolor('#4B0082')
+
+    # Plot trend line from data
+    ax.plot(df["StudyHours"], df["Marks"], color='#60a5fa', linewidth=3, marker='o', markerfacecolor='white', label='Average Growth')
+    
+    # Highlight the current prediction point
+    ax.scatter(sh_val, marks, color=status_color, s=200, zorder=5, label='Your Prediction', edgecolor='white')
+    ax.annotate(f"{marks:.1f}", (sh_val, marks), xytext=(sh_val, marks+5), color='white', fontweight='bold', ha='center')
+
+    # Styling axes
+    ax.spines['bottom'].set_color('white')
+    ax.spines['left'].set_color('white')
+    ax.spines['top'].set_visible(False)
+    ax.spines['right'].set_visible(False)
+    ax.tick_params(axis='x', colors='white')
+    ax.tick_params(axis='y', colors='white')
+    ax.set_xlabel("Study Hours", color='white')
+    ax.set_ylabel("Expected Marks", color='white')
+    ax.grid(color='white', alpha=0.1)
+    ax.legend(facecolor='#4B0082', labelcolor='white')
+
+    st.pyplot(fig)
+
+st.markdown("<br><hr><center style='opacity:0.3; color:white;'>Predictor AI v2.6</center>", unsafe_allow_html=True)
