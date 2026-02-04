@@ -19,16 +19,29 @@ st.set_page_config(
 # =============================
 st.markdown("""
 <style>
+/* Main Background set to Black */
 .stApp {
-    background-color: #4B0082;
+    background-color: #000000;
     color: white;
 }
+
+/* Info Box Styling */
 .info-box {
-    background: rgba(255,255,255,0.12);
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.1);
     border-radius: 25px;
     padding: 35px;
     text-align: center;
 }
+
+/* Targeted Green color for Input Labels */
+label {
+    color: #22c55e !important;
+    font-weight: bold !important;
+    font-size: 1.1rem !important;
+}
+
+/* Input Field Styling */
 .stTextInput > div > div > input {
     background-color: white !important;
     color: black !important;
@@ -36,6 +49,8 @@ st.markdown("""
     height: 45px;
     text-align: center;
 }
+
+/* Button Styling */
 .stButton > button {
     background-color: #2563eb;
     color: white;
@@ -74,8 +89,11 @@ with col2:
     st.markdown('<div class="info-box">', unsafe_allow_html=True)
     st.markdown("<h1>Student Result Prediction</h1>", unsafe_allow_html=True)
     st.markdown("<p style='opacity:0.8;'>Hybrid ML Model (Pass/Fail + Marks Estimation)</p>", unsafe_allow_html=True)
+    
+    # Labels will appear green due to the 'label' CSS selector above
     sh = st.text_input("Daily Study Hours", "9")
     at = st.text_input("Attendance Percentage (%)", "70")
+    
     predict = st.button("Generate Prediction")
     st.markdown("</div>", unsafe_allow_html=True)
 
@@ -110,7 +128,7 @@ if predict:
         st.write("") 
         components.html(f"""
         <div style="
-            background:rgba(255,255,255,0.15);
+            background:rgba(255,255,255,0.1);
             padding:30px;
             border-radius:25px;
             text-align:center;
@@ -131,7 +149,8 @@ if predict:
     components.html(f"""
     <div style="
         margin-top:20px;
-        background:linear-gradient(135deg,#6a11cb,#2575fc);
+        background: linear-gradient(135deg, #111111, #000000);
+        border: 1px solid rgba(255,255,255,0.1);
         border-radius:30px;
         padding:40px;
         color:white;
@@ -169,7 +188,7 @@ if predict:
             </div>
         </div>
 
-        <div style="margin-top:30px; padding:20px; background:rgba(0,0,0,0.2); border-left:8px solid {status_color}; border-radius:15px;">
+        <div style="margin-top:30px; padding:20px; background:rgba(255,255,255,0.05); border-left:8px solid {status_color}; border-radius:15px;">
             <b style="font-size:18px;">AI Recommendation:</b><br>
             <span>{advice}</span>
         </div>
@@ -182,8 +201,8 @@ if predict:
     st.write("## 📈 Marks Trend vs Study Hours")
     
     fig, ax = plt.subplots(figsize=(10, 4))
-    fig.patch.set_facecolor('Black') # Match app background
-    ax.set_facecolor('#4B0082')
+    fig.patch.set_facecolor('black') 
+    ax.set_facecolor('black')
 
     # Plot trend line from data
     ax.plot(df["StudyHours"], df["Marks"], color='#60a5fa', linewidth=3, marker='o', markerfacecolor='white', label='Average Growth')
@@ -202,10 +221,8 @@ if predict:
     ax.set_xlabel("Study Hours", color='white')
     ax.set_ylabel("Expected Marks", color='white')
     ax.grid(color='white', alpha=0.1)
-    ax.legend(facecolor='#4B0082', labelcolor='white')
+    ax.legend(facecolor='black', labelcolor='white')
 
     st.pyplot(fig)
 
-st.markdown("<br><hr><center style='opacity:0.3; color:white;'>Predictor AI v2.6</center>", unsafe_allow_html=True)
-
-
+st.markdown("<br><hr style='border-color: #333;'><center style='opacity:0.3; color:white;'>Predictor AI v2.6</center>", unsafe_allow_html=True)
