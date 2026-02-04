@@ -1,5 +1,3 @@
-
-
 import streamlit as st
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -25,41 +23,27 @@ st.markdown("""
     background-color: #4B0082;
     color: white;
 }
-
-/* Input Card */
 .info-box {
     background: rgba(255,255,255,0.12);
     border-radius: 25px;
     padding: 35px;
     text-align: center;
 }
-
-/* Text Input Box */
 .stTextInput > div > div > input {
     background-color: white !important;
     color: black !important;
     border-radius: 12px;
     height: 45px;
     text-align: center;
-    font-size: 16px;
 }
-
-/* Button */
 .stButton > button {
     background-color: #2563eb;
     color: white;
     border-radius: 12px;
     height: 45px;
     width: 100%;
-    font-size: 16px;
     font-weight: bold;
     border: none;
-    transition: 0.3s;
-}
-
-.stButton > button:hover {
-    background-color: #1d4ed8;
-    transform: scale(1.02);
 }
 </style>
 """, unsafe_allow_html=True)
@@ -82,23 +66,20 @@ log_model = LogisticRegression().fit(X_scaled, df["Result"])
 lin_model = LinearRegression().fit(X_scaled, df["Marks"])
 
 # =============================
-# UI INPUT (CENTERED)
+# UI INPUT
 # =============================
 col1, col2, col3 = st.columns([1,2,1])
 
 with col2:
     st.markdown('<div class="info-box">', unsafe_allow_html=True)
-    st.markdown("<h1>Student Result Prediction</h1>", unsafe_allow_html=True)
-    st.markdown("<p style='opacity:0.8;'>Hybrid ML Model (Pass/Fail + Marks Estimation)</p>", unsafe_allow_html=True)
-
+    st.markdown("<h1>Student Result Prediction</h1>")
     sh = st.text_input("Daily Study Hours", "8")
     at = st.text_input("Attendance Percentage (%)", "85")
     predict = st.button("Generate Prediction")
-
     st.markdown("</div>", unsafe_allow_html=True)
 
 # =============================
-# Prediction Logic
+# Dynamic Prediction Logic
 # =============================
 if predict:
     sh_val = float(sh)
@@ -108,21 +89,21 @@ if predict:
     pass_prob = log_model.predict_proba(inp)[0][1]
     marks = min(lin_model.predict(inp)[0], 100)
 
-    # Dynamic styling
-    if pass_prob >= 0.8:
-        level, color = "Excellent", "#22c55e"
-        advice = "Fantastic! Your preparation is solid. Keep revising weekly."
-    elif pass_prob >= 0.6:
-        level, color = "Good", "#facc15"
-        advice = "You're on the right track. Focus on solving mock papers."
-    else:
-        level, color = "Needs Improvement", "#ef4444"
-        advice = "Immediate attention required. Increase study hours and attendance."
-
-    progress_width = int(pass_prob * 100)
+    # Logic for Dynamic Colors and Status
+    is_pass = pass_prob >= 0.5
+    result_text = "PASS" if is_pass else "FAIL"
+    main_color = "#22c55e" if is_pass else "#ef4444" # Green if Pass, Red if Fail
+    
+    # Topic-specific colors (Dynamic based on Pass/Fail)
+    math_color = "#60a5fa" if is_pass else "#f87171"
+    prog_color = "#22c55e" if is_pass else "#f87171"
+    
+    # Topic-specific feedback text
+    math_feedback = "Concept clear, improve speed." if is_pass else "Weak concepts, need basics."
+    prog_feedback = "Good logic, practice projects." if is_pass else "Logic errors, need more coding."
 
     # =============================
-    # Prediction Result Display
+    # Section 1: Prediction Result (Dynamic)
     # =============================
     with col2:
         st.write("") 
@@ -133,102 +114,65 @@ if predict:
             border-radius:25px;
             text-align:center;
             color:white;
-            font-family: 'Segoe UI', sans-serif;">
+            font-family: sans-serif;">
             <h2 style="margin:0;">Prediction Result</h2>
             <p style="font-size:18px; margin:10px 0;">Pass Probability: <b>{pass_prob*100:.1f}%</b></p>
             <p style="font-size:18px; margin:0;">Estimated Marks: <b>{marks:.1f}/100</b></p>
-            <h1 style="color:{color}; font-size:60px; margin:15px 0; font-weight:900;">
-                {'PASS' if pass_prob >= 0.5 else 'FAIL'}
+            <h1 style="color:{main_color}; font-size:70px; margin:15px 0; font-weight:900;">
+                {result_text}
             </h1>
         </div>
         """, height=280)
 
     # =============================
-    # Advanced Dashboard with % Bars
+    # Section 2: Topic-wise Performance (Dynamic)
     # =============================
     components.html(f"""
     <div style="
         margin-top:20px;
         background:linear-gradient(135deg,#6a11cb,#2575fc);
         border-radius:30px;
-        padding:45px;
+        padding:40px;
         color:white;
         font-family: sans-serif;
-        box-shadow:0 20px 40px rgba(0,0,0,0.3);
     ">
-        <h1 style="margin-top:0;">Advanced Analytics & Recommendations</h1>
-        <p style="font-size:18px;"><b>Status:</b> <span style="color:{color};">{level}</span></p>
-
-        <div style="background:rgba(255,255,255,0.2); border-radius:15px; height:12px; margin-bottom:30px;">
-            <div style="width:{progress_width}%; background:{color}; height:100%; border-radius:15px;"></div>
-        </div>
-
-        <h2 style="border-bottom: 1px solid rgba(255,255,255,0.3); padding-bottom:10px;">📌 Topic-wise Performance</h2>
-
-        <div style="background:rgba(0,0,0,0.2); padding:20px; border-radius:15px; margin-bottom:15px;">
-            <div style="display:flex; justify-content:space-between; font-weight:bold;">
-                <span>📘 Mathematics: <span style="font-weight:normal; opacity:0.8;">Concept clear, improve speed.</span></span>
-                <span>75%</span>
+        <h2 style="margin-top:0;">📌 Topic-wise Performance</h2>
+        <hr style="opacity: 0.3; margin-bottom: 25px;">
+        
+        <div style="margin-bottom:25px;">
+            <div style="display:flex; justify-content:space-between; align-items: center;">
+                <span>📘 <b>Mathematics:</b> {math_feedback}</span>
+                <span style="font-weight:bold;">{int(pass_prob * 85)}%</span>
             </div>
-            <div style="background:rgba(255,255,255,0.1); border-radius:10px; height:8px; margin-top:10px;">
-                <div style="width:75%; background:#60a5fa; height:100%; border-radius:10px;"></div>
+            <div style="background:rgba(255,255,255,0.15); border-radius:10px; height:10px; margin-top:10px;">
+                <div style="width:{int(pass_prob * 85)}%; background:{math_color}; height:100%; border-radius:10px; box-shadow: 0 0 10px {math_color};"></div>
             </div>
         </div>
 
-        <div style="background:rgba(0,0,0,0.2); padding:20px; border-radius:15px; margin-bottom:15px;">
-            <div style="display:flex; justify-content:space-between; font-weight:bold;">
-                <span>💻 Programming: <span style="font-weight:normal; opacity:0.8;">Good logic, practice projects.</span></span>
-                <span>88%</span>
+        <div style="margin-bottom:25px;">
+            <div style="display:flex; justify-content:space-between; align-items: center;">
+                <span>💻 <b>Programming:</b> {prog_feedback}</span>
+                <span style="font-weight:bold;">{int(pass_prob * 90)}%</span>
             </div>
-            <div style="background:rgba(255,255,255,0.1); border-radius:10px; height:8px; margin-top:10px;">
-                <div style="width:88%; background:#22c55e; height:100%; border-radius:10px;"></div>
+            <div style="background:rgba(255,255,255,0.15); border-radius:10px; height:10px; margin-top:10px;">
+                <div style="width:{int(pass_prob * 90)}%; background:{prog_color}; height:100%; border-radius:10px; box-shadow: 0 0 10px {prog_color};"></div>
             </div>
-        </div>
-
-        <div style="margin-top:30px; padding:20px; background:rgba(0,0,0,0.3); border-left:8px solid {color}; border-radius:15px;">
-            <b style="font-size:20px;">AI Personalized Recommendation:</b><br><br>
-            <span style="font-size:18px;">{advice}</span>
         </div>
     </div>
-    """, height=620)
+    """, height=400)
 
     # =============================
-    # PERFORMANCE LINE CHART
+    # Line Chart
     # =============================
     st.write("## 📈 Performance Growth Projection")
-    
-    # Generate Line Data
     fig, ax = plt.subplots(figsize=(10, 4))
-    fig.patch.set_facecolor('Black') # Match app background
+    fig.patch.set_facecolor('#000000') 
     ax.set_facecolor('#4B0082')
-
-    # Plot the general trend line
-    ax.plot(df["StudyHours"], df["Marks"], color='#60a5fa', linewidth=3, marker='o', markerfacecolor='white', label='Average Growth Trend')
+    ax.plot(df["StudyHours"], df["Marks"], color='#60a5fa', linewidth=3, marker='o', markerfacecolor='white')
+    ax.scatter(sh_val, marks, color=main_color, s=200, zorder=5, edgecolor='white')
     
-    # Plot the user's current position
-    ax.scatter(sh_val, marks, color='#facc15', s=200, zorder=5, label='Your Current Position', edgecolor='white')
-    ax.annotate(f"You: {marks:.1f} Marks", (sh_val, marks), xytext=(sh_val-1, marks+5), color='#facc15', fontweight='bold')
-
-    # Styling the axes
-    ax.spines['bottom'].set_color('white')
-    ax.spines['left'].set_color('white')
-    ax.spines['top'].set_visible(False)
-    ax.spines['right'].set_visible(False)
-    ax.tick_params(axis='x', colors='white')
-    ax.tick_params(axis='y', colors='white')
-    ax.set_xlabel("Study Hours", color='white', fontsize=12)
-    ax.set_ylabel("Expected Marks", color='white', fontsize=12)
-    ax.grid(color='white', alpha=0.1)
-    ax.legend(facecolor='#4B0082', labelcolor='white')
-
+    ax.tick_params(colors='white')
+    for spine in ax.spines.values(): spine.set_color('white')
     st.pyplot(fig)
 
-# =============================
-# Footer
-# =============================
-st.markdown(
-    "<br><hr><center style='opacity:0.5; color:white;'>Predictor v2.6 | Data Science Student Portal</center>",
-    unsafe_allow_html=True
-)
-
-
+st.markdown("<br><hr><center style='opacity:0.5; color:white;'>Predictor v2.6 | AI Student Dashboard</center>", unsafe_allow_html=True)
