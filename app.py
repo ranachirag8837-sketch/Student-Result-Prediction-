@@ -1,6 +1,5 @@
 import streamlit as st
 import pandas as pd
-import numpy as np
 import matplotlib.pyplot as plt
 from sklearn.preprocessing import StandardScaler
 from sklearn.linear_model import LogisticRegression, LinearRegression
@@ -81,19 +80,19 @@ with col2:
     <p style="opacity:0.7;">Hybrid ML Model (Logistic + Linear Regression)</p>
     """, unsafe_allow_html=True)
 
-    sh = st.text_input("Study Hours (per day)", "8")
-    at = st.text_input("Attendance (%)", "85")
+    sh_input = st.text_input("Study Hours (per day)", "8")
+    at_input = st.text_input("Attendance (%)", "85")
 
     predict = st.button("Predict Result")
     st.markdown("</div>", unsafe_allow_html=True)
 
 # =============================
-# 5. Prediction + Output
+# 5. Prediction + Dynamic Output
 # =============================
 if predict:
     try:
-        sh = float(sh)
-        at = float(at)
+        sh = float(sh_input)
+        at = float(at_input)
 
         inp = scaler.transform([[sh, at]])
 
@@ -101,9 +100,33 @@ if predict:
         marks = min(lin_model.predict(inp)[0], 100)
 
         status = "PASS" if pass_prob >= 0.5 else "FAIL"
-        color = "#4ade80" if status == "PASS" else "#f87171"
+        color = "#22c55e" if status == "PASS" else "#ef4444"
+
+        # ---- Dynamic Logic ----
+        level = (
+            "Excellent" if pass_prob >= 0.8 else
+            "Good" if pass_prob >= 0.6 else
+            "Needs Improvement"
+        )
+
+        level_color = (
+            "#22c55e" if pass_prob >= 0.8 else
+            "#facc15" if pass_prob >= 0.6 else
+            "#ef4444"
+        )
+
+        recommendation = (
+            "You are doing great. Maintain consistency and revise weekly."
+            if pass_prob >= 0.8 else
+            "You are close to success. Focus more on weak subjects."
+            if pass_prob >= 0.6 else
+            "High risk detected. Increase study hours and attendance immediately."
+        )
+
+        progress = int(pass_prob * 100)
 
         with col2:
+            # ---- Prediction Card ----
             components.html(f"""
             <div style="background:rgba(255,255,255,0.12);
                         padding:25px;
@@ -116,30 +139,48 @@ if predict:
             </div>
             """, height=260)
 
-            # =============================
-            # 🔥 Advanced Features Section (IMAGE STYLE)
-            # =============================
-            st.markdown("""
+            # ---- IMAGE STYLE + DYNAMIC ADVANCED FEATURES ----
+            st.markdown(f"""
             <div style="
                 background: linear-gradient(135deg, #6a11cb, #2575fc);
-                border-radius: 20px;
-                padding: 30px;
-                margin-top: 25px;
-                box-shadow: 0 10px 25px rgba(0,0,0,0.25);
+                border-radius: 25px;
+                padding: 35px;
+                margin-top: 30px;
+                color: white;
+                box-shadow: 0 15px 30px rgba(0,0,0,0.35);
             ">
-                <h3 style="margin-bottom:15px;">Advanced Features & Recommendations</h3>
-                <ol style="line-height:1.8; font-size:0.95rem;">
-                    <li><b>Personalized Study Plan:</b> Generate schedule based on weak areas.</li>
-                    <li><b>Topic-wise Analysis:</b> Detailed performance by subject.</li>
-                    <li><b>Peer Comparison:</b> View anonymous comparative stats.</li>
-                    <li><b>Goal Setting & Tracking:</b> Monitor achievement progress.</li>
-                    <li><b>Tutor Connect:</b> Request AI or human tutor assistance.</li>
-                </ol>
+                <h2>Advanced Features & Recommendations</h2>
+
+                <p><b>1. Personalized Study Plan:</b>
+                <span style="color:{level_color}; font-weight:bold;"> {level}</span></p>
+
+                <div style="background:rgba(255,255,255,0.25);
+                            border-radius:10px; overflow:hidden; margin-bottom:15px;">
+                    <div style="width:{progress}%;
+                                background:{level_color};
+                                padding:6px;"></div>
+                </div>
+
+                <p><b>2. Topic-wise Analysis:</b> Detailed performance by subject.</p>
+                <p><b>3. Peer Comparison:</b> Anonymous comparative statistics.</p>
+                <p><b>4. Goal Setting & Tracking:</b> Smart progress monitoring.</p>
+                <p><b>5. Tutor Connect:</b> AI or Human tutor support.</p>
+
+                <div style="
+                    margin-top:20px;
+                    padding:15px;
+                    background:rgba(0,0,0,0.25);
+                    border-left:5px solid {level_color};
+                    border-radius:10px;">
+                    <b>AI Recommendation:</b><br>
+                    {recommendation}
+                </div>
             </div>
             """, unsafe_allow_html=True)
 
             st.markdown("---")
-            st.markdown("<h3 style='text-align:center;'>Study Hours vs Attendance</h3>", unsafe_allow_html=True)
+            st.markdown("<h3 style='text-align:center;'>Study Hours vs Attendance</h3>",
+                        unsafe_allow_html=True)
 
             fig, ax = plt.subplots()
             fig.patch.set_facecolor('#4B0082')
@@ -150,7 +191,13 @@ if predict:
             ax.legend()
             st.pyplot(fig)
 
-    except:
+    except ValueError:
         st.error("Please enter valid numeric values")
 
-st.markdown("<center style='opacity:0.5;'>Predictor v2.3 | AI Analytics Dashboard</center>", unsafe_allow_html=True)
+# =============================
+# Footer
+# =============================
+st.markdown(
+    "<center style='opacity:0.5;'>Predictor v2.3 | AI Analytics Dashboard</center>",
+    unsafe_allow_html=True
+)
