@@ -14,7 +14,7 @@ st.set_page_config(
 )
 
 # =============================
-# CSS
+# CSS (FIXED TEXTBOX COLOR)
 # =============================
 st.markdown("""
 <style>
@@ -22,14 +22,33 @@ st.markdown("""
     background-color: #4B0082;
     color: white;
 }
+
+/* Input Card */
 .info-box {
     background: rgba(255,255,255,0.12);
     border-radius: 25px;
     padding: 35px;
     text-align: center;
 }
-input {
+
+/* Text Input Box */
+.stTextInput > div > div > input {
+    background-color: white !important;
+    color: black !important;
+    border-radius: 12px;
+    height: 45px;
     text-align: center;
+    font-size: 16px;
+}
+
+/* Button */
+.stButton > button {
+    background-color: #2563eb;
+    color: white;
+    border-radius: 12px;
+    height: 45px;
+    font-size: 16px;
+    font-weight: bold;
 }
 </style>
 """, unsafe_allow_html=True)
@@ -61,9 +80,10 @@ with col2:
     st.markdown("<h1>Student Result Prediction</h1>", unsafe_allow_html=True)
     st.markdown("<p>Hybrid ML Model (Pass / Fail + Marks)</p>", unsafe_allow_html=True)
 
-    sh = st.text_input("Study Hours")
-    at = st.text_input("Attendance %")
+    sh = st.text_input("Study Hours", "8")
+    at = st.text_input("Attendance %", "85")
     predict = st.button("Predict")
+
     st.markdown("</div>", unsafe_allow_html=True)
 
 # =============================
@@ -93,7 +113,7 @@ if predict:
     progress = int(pass_prob * 100)
 
     # =============================
-    # Prediction Result (CENTER)
+    # Prediction Result
     # =============================
     with col2:
         components.html(f"""
@@ -186,7 +206,6 @@ if predict:
 # Footer
 # =============================
 st.markdown(
-    "<center style='opacity:0.6;'>Predictor v2.5 | AI Analytics Dashboard</center>",
+    "<center style='opacity:0.6;'>Predictor v2.6 | AI Analytics Dashboard</center>",
     unsafe_allow_html=True
 )
-
