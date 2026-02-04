@@ -9,13 +9,12 @@ import streamlit.components.v1 as components
 # Page Config
 # =============================
 st.set_page_config(
-    page_title="🎓 Student Result Prediction AI",
-    page_icon="🎓",
+    page_title="Student Result Prediction AI",
     layout="wide"
 )
 
 # =============================
-# CSS (Centering Text and Large Button)
+# CSS (FIXED TEXTBOX COLOR)
 # =============================
 st.markdown("""
 <style>
@@ -24,53 +23,32 @@ st.markdown("""
     color: white;
 }
 
-/* Input Card Container */
+/* Input Card */
 .info-box {
     background: rgba(255,255,255,0.12);
     border-radius: 25px;
-    padding: 40px;
+    padding: 35px;
     text-align: center;
 }
 
-/* Centering Input Labels */
-.stTextInput label {
-    display: block !important;
-    text-align: center !important;
-    width: 100%;
-    color: white !important;
-    font-size: 18px !important;
-    font-weight: 600;
-}
-
-/* Centering Input Box Text */
+/* Text Input Box */
 .stTextInput > div > div > input {
     background-color: white !important;
     color: black !important;
     border-radius: 12px;
-    height: 50px;
+    height: 45px;
     text-align: center;
     font-size: 16px;
 }
 
-/* BIG Predict Button Styling */
+/* Button */
 .stButton > button {
     background-color: #2563eb;
     color: white;
     border-radius: 12px;
-    width: 100% !important;  /* Makes button wide */
-    height: 60px !important; /* Makes button tall */
-    font-size: 22px !important;
+    height: 45px;
+    font-size: 16px;
     font-weight: bold;
-    border: none;
-    margin-top: 25px;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.3);
-    transition: 0.3s;
-}
-
-.stButton > button:hover {
-    background-color: #1d4ed8;
-    transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(0,0,0,0.4);
 }
 </style>
 """, unsafe_allow_html=True)
@@ -79,10 +57,10 @@ st.markdown("""
 # Dataset & Models
 # =============================
 df = pd.DataFrame({
-    "StudyHours": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
-    "Attendance": [40, 45, 50, 60, 65, 75, 80, 85, 90, 95],
-    "Result": [0, 0, 0, 0, 1, 1, 1, 1, 1, 1],
-    "Marks": [25, 30, 38, 45, 55, 68, 75, 82, 88, 95]
+    "StudyHours": [1,2,3,4,5,6,7,8,9,10],
+    "Attendance": [40,45,50,60,65,75,80,85,90,95],
+    "Result": [0,0,0,0,1,1,1,1,1,1],
+    "Marks": [25,30,38,45,55,68,75,82,88,95]
 })
 
 X = df[["StudyHours", "Attendance"]]
@@ -93,68 +71,141 @@ log_model = LogisticRegression().fit(X_scaled, df["Result"])
 lin_model = LinearRegression().fit(X_scaled, df["Marks"])
 
 # =============================
-# UI Layout
+# UI INPUT (CENTER)
 # =============================
-col1, col2, col3 = st.columns([1, 2, 1])
+col1, col2, col3 = st.columns([1,2,1])
 
 with col2:
     st.markdown('<div class="info-box">', unsafe_allow_html=True)
-    st.markdown("<h1 style='margin-bottom:0;'>🎓 Student Prediction</h1>", unsafe_allow_html=True)
-    st.markdown("<p style='opacity:0.8; margin-bottom:30px;'>Hybrid ML Model (Pass/Fail + Marks)</p>", unsafe_allow_html=True)
+    st.markdown("<h1>Student Result Prediction</h1>", unsafe_allow_html=True)
+    st.markdown("<p>Hybrid ML Model (Pass / Fail + Marks)</p>", unsafe_allow_html=True)
 
-    # Input Fields (Labels are centered via CSS)
-    sh = st.text_input("Study Hours", placeholder="Enter hours (e.g. 7)")
-    at = st.text_input("Attendance %", placeholder="Enter percentage (e.g. 85)")
-    
-    # Large Predict Button
-    predict = st.button("Predict Result")
-    
+    sh = st.text_input("Study Hours", "8")
+    at = st.text_input("Attendance %", "85")
+    predict = st.button("Predict")
+
     st.markdown("</div>", unsafe_allow_html=True)
 
 # =============================
-# Prediction Output
+# Prediction
 # =============================
 if predict:
-    if sh and at:
-        try:
-            sh_val = float(sh)
-            at_val = float(at)
+    sh = float(sh)
+    at = float(at)
 
-            # Process Prediction
-            inp = scaler.transform([[sh_val, at_val]])
-            pass_prob = log_model.predict_proba(inp)[0][1]
-            marks = min(lin_model.predict(inp)[0], 100)
+    inp = scaler.transform([[sh, at]])
+    pass_prob = log_model.predict_proba(inp)[0][1]
+    marks = min(lin_model.predict(inp)[0], 100)
 
-            result_color = "#22c55e" if pass_prob >= 0.5 else "#ef4444"
-            result_text = "PASS" if pass_prob >= 0.5 else "FAIL"
-
-            with col2:
-                st.markdown("<br>", unsafe_allow_html=True)
-                components.html(f"""
-                <div style="
-                    background:rgba(255,255,255,0.18);
-                    padding:30px;
-                    border-radius:25px;
-                    text-align:center;
-                    color:white;
-                    font-family: Arial, sans-serif;
-                    border: 2px solid {result_color};">
-                    <h2 style="margin:0; opacity:0.9;">Prediction Summary</h2>
-                    <p style="font-size:20px; margin:10px 0;">Estimated Marks: <b>{marks:.1f}/100</b></p>
-                    <h1 style="color:{result_color}; font-size: 65px; margin:15px 0; letter-spacing:2px;">{result_text}</h1>
-                    <p style="opacity:0.8;">Probability: {pass_prob*100:.1f}%</p>
-                </div>
-                """, height=300)
-                
-        except ValueError:
-            st.error("Invalid Input! Please enter numbers only.")
+    if pass_prob >= 0.8:
+        level = "Excellent"
+        color = "#22c55e"
+        advice = "You are doing great. Maintain consistency and revise weekly."
+    elif pass_prob >= 0.6:
+        level = "Good"
+        color = "#facc15"
+        advice = "You are close to success. Focus more on weak subjects."
     else:
-        st.warning("Please fill in both fields before predicting.")
+        level = "Needs Improvement"
+        color = "#ef4444"
+        advice = "Increase study hours and attendance immediately."
+
+    progress = int(pass_prob * 100)
+
+    # =============================
+    # Prediction Result
+    # =============================
+    with col2:
+        components.html(f"""
+        <div style="
+            background:rgba(255,255,255,0.18);
+            padding:30px;
+            border-radius:25px;
+            text-align:center;
+            color:white;">
+            <h2>Prediction Result</h2>
+            <p>Pass Probability: <b>{pass_prob*100:.1f}%</b></p>
+            <p>Estimated Marks: <b>{marks:.1f}/100</b></p>
+            <h1 style="color:{color}; font-weight:800;">
+                {'PASS' if pass_prob >= 0.5 else 'FAIL'}
+            </h1>
+        </div>
+        """, height=260)
+
+    # =============================
+    # FULL SCREEN ADVANCED FEATURES
+    # =============================
+    components.html(f"""
+    <div style="
+        margin-top:40px;
+        width:100%;
+        background:linear-gradient(135deg,#6a11cb,#2575fc);
+        border-radius:30px;
+        padding:45px;
+        color:white;
+        box-shadow:0 20px 40px rgba(0,0,0,0.35);
+    ">
+        <h1>Advanced Features & Recommendations</h1>
+
+        <p style="font-size:18px;">
+            <b>Personalized Study Plan:</b>
+            <span style="color:{color}; font-weight:bold;"> {level}</span>
+        </p>
+
+        <div style="background:rgba(255,255,255,0.25);
+                    border-radius:12px;
+                    overflow:hidden;
+                    margin-bottom:25px;">
+            <div style="width:{progress}%;
+                        background:{color};
+                        padding:8px;"></div>
+        </div>
+
+        <h2>📌 Topic-wise Performance</h2>
+
+        <div style="background:rgba(0,0,0,0.25); padding:18px; border-radius:15px; margin-bottom:12px;">
+            📘 <b>Mathematics:</b> Concept clear, improve speed.
+        </div>
+
+        <div style="background:rgba(0,0,0,0.25); padding:18px; border-radius:15px; margin-bottom:12px;">
+            💻 <b>Programming:</b> Good logic, practice projects.
+        </div>
+
+        <div style="background:rgba(0,0,0,0.25); padding:18px; border-radius:15px; margin-bottom:12px;">
+            📊 <b>Data Analysis:</b> Data handling strong, focus on charts.
+        </div>
+
+        <div style="background:rgba(0,0,0,0.25); padding:18px; border-radius:15px; margin-bottom:12px;">
+            🤖 <b>Machine Learning:</b> Models understood, try tuning.
+        </div>
+
+        <div style="
+            margin-top:25px;
+            padding:20px;
+            background:rgba(0,0,0,0.35);
+            border-left:6px solid {color};
+            border-radius:15px;">
+            <b>AI Recommendation:</b><br>
+            {advice}
+        </div>
+    </div>
+    """, height=650)
+
+    # =============================
+    # Graph
+    # =============================
+    fig, ax = plt.subplots()
+    fig.patch.set_facecolor('#4B0082')
+    ax.bar(df["StudyHours"], df["Attendance"], alpha=0.5)
+    ax.bar(sh, at, width=0.4)
+    ax.set_xlabel("Study Hours")
+    ax.set_ylabel("Attendance %")
+    st.pyplot(fig)
 
 # =============================
 # Footer
 # =============================
 st.markdown(
-    "<br><hr><center style='opacity:0.5; font-size:14px;'>Predictor v2.6 | AI Analytics Dashboard</center>",
+    "<center style='opacity:0.6;'>Predictor v2.6 | AI Analytics Dashboard</center>",
     unsafe_allow_html=True
 )
