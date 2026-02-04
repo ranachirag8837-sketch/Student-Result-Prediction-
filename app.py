@@ -198,7 +198,7 @@ if predict:
     fig, ax = plt.subplots()
     fig.patch.set_facecolor('#4B0082')
     ax.bar(df["StudyHours"], df["Attendance"], alpha=0.5)
-    ax.bar(sh, at, width=0.4)
+    ax.bar(sh, at, width=0.2)
     ax.set_xlabel("Study Hours")
     ax.set_ylabel("Attendance %")
     st.pyplot(fig)
@@ -210,3 +210,4 @@ st.markdown(
     "<center style='opacity:0.6;'>Predictor v2.6 | AI Analytics Dashboard</center>",
     unsafe_allow_html=True
 )
+
