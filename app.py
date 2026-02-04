@@ -197,7 +197,7 @@ if predict:
     
     # Generate Line Data
     fig, ax = plt.subplots(figsize=(10, 4))
-    fig.patch.set_facecolor('#4B0082') # Match app background
+    fig.patch.set_facecolor('Black') # Match app background
     ax.set_facecolor('#4B0082')
 
     # Plot the general trend line
@@ -228,4 +228,5 @@ st.markdown(
     "<br><hr><center style='opacity:0.5; color:white;'>Predictor v2.6 | Data Science Student Portal</center>",
     unsafe_allow_html=True
 )
+
 
