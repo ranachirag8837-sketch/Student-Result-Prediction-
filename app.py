@@ -9,7 +9,8 @@ import streamlit.components.v1 as components
 # Page Config
 # =============================
 st.set_page_config(
-    page_title="Student Result Prediction AI",
+    page_title="🎓 Student Result Prediction AI",
+    page_icon="🎓",
     layout="wide"
 )
 
@@ -209,3 +210,4 @@ st.markdown(
     "<center style='opacity:0.6;'>Predictor v2.6 | AI Analytics Dashboard</center>",
     unsafe_allow_html=True
 )
+
